@@ -25,7 +25,7 @@ public abstract class Solver<S extends Solution<?>> {
     public abstract S solve(Param param,
                             List<PatientCycleDemand> cycleDemands,
                             List<Allocation> existingAllocations)
-    throws SolverException;
+            throws SolverException;
 
     protected void initWorkloadWith(List<Allocation> existingAllocations) {
         doctorWorkload = new HashMap<>();
@@ -106,10 +106,10 @@ public abstract class Solver<S extends Solution<?>> {
      * <tt>start</tt> to <tt>end</tt> (exclusive), given the
      * current <tt>workloadOnDay</tt> of resource
      */
-    private boolean cannotRequireResource(int[] resourceOnDay,
-                                          int start,
-                                          int end,
-                                          int[] workloadOnDay) {
+    protected boolean cannotRequireResource(int[] resourceOnDay,
+                                            int start,
+                                            int end,
+                                            int[] workloadOnDay) {
         if (start > resourceOnDay.length || end > resourceOnDay.length)
             return true;
         for (int i = start; i < end; i++) {
@@ -119,11 +119,11 @@ public abstract class Solver<S extends Solution<?>> {
         return false;
     }
 
-    private boolean cannotRequireResource(int[] resourceOnDay,
-                                          float amount,
-                                          int start,
-                                          int end,
-                                          float[] workloadOnDay) {
+    protected boolean cannotRequireResource(int[] resourceOnDay,
+                                            float amount,
+                                            int start,
+                                            int end,
+                                            float[] workloadOnDay) {
         if (start > resourceOnDay.length || end > resourceOnDay.length)
             return true;
         for (int i = start; i < end; i++) {
@@ -137,9 +137,9 @@ public abstract class Solver<S extends Solution<?>> {
      * If cannot use <tt>resourceOnDay</tt> from <tt>start</tt> to <tt>end</tt>
      * (exclusive)
      */
-    private boolean cannotRequireBinaryResource(boolean[] resourceOnDay,
-                                                int start,
-                                                int end) {
+    protected boolean cannotRequireBinaryResource(boolean[] resourceOnDay,
+                                                  int start,
+                                                  int end) {
         if (start >= resourceOnDay.length || end >= resourceOnDay.length)
             return true;
         for (int i = start; i < end; i++) {
@@ -149,10 +149,10 @@ public abstract class Solver<S extends Solution<?>> {
         return false;
     }
 
-    private boolean overuseConstantResource(int constant,
-                                            int start,
-                                            int end,
-                                            int[] workloadOnDay) {
+    protected boolean overuseConstantResource(int constant,
+                                              int start,
+                                              int end,
+                                              int[] workloadOnDay) {
         for (int i = start; i < end; i++) {
             if (workloadOnDay[i] + 1 > constant)
                 return true;

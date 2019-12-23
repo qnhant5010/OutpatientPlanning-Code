@@ -16,7 +16,7 @@ public class FirstFitStrategyAllocator extends Solver<MinimizingMakespanSolution
     public MinimizingMakespanSolution solve(Param param,
                                             List<PatientCycleDemand> cycleDemands,
                                             List<Allocation> existingAllocations)
-    throws SolverException {
+            throws SolverException {
         this.param = param;
         solution = new MinimizingMakespanSolution(param.getNumTimeSlots());
         initWorkloadWith(existingAllocations);
@@ -25,7 +25,7 @@ public class FirstFitStrategyAllocator extends Solver<MinimizingMakespanSolution
         return solution;
     }
 
-    void allocate(PatientCycleDemand cycleDemand) throws SolverException {
+    protected void allocate(PatientCycleDemand cycleDemand) throws SolverException {
         List<PatientRdvDemand> rdvDemands = cycleDemand.getRdvDemands();
         for (int i = 1; i <= param.getDays(); i++) {
             List<Allocation> attempts = new ArrayList<>();
@@ -63,10 +63,9 @@ public class FirstFitStrategyAllocator extends Solver<MinimizingMakespanSolution
     /**
      * @param rdvDemand
      * @param day       >= 1 and <= <tt>param.getDays()</tt>
-     *
      * @return
      */
-    private Allocation tryBooking(PatientRdvDemand rdvDemand, int day) {
+    protected Allocation tryBooking(PatientRdvDemand rdvDemand, int day) {
         Allocation allocation = Allocation.builder()
                 .sessionDay(day)
                 .sectorId(rdvDemand.getSectorId())
@@ -209,7 +208,7 @@ public class FirstFitStrategyAllocator extends Solver<MinimizingMakespanSolution
      * @param allocations attempts
      * @param patientId   for who
      */
-    private void register(List<Allocation> allocations,
+    protected void register(List<Allocation> allocations,
                           long patientId) {
         solution.save(allocations, patientId);
         registerWorkload(allocations);

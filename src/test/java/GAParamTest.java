@@ -26,7 +26,8 @@ class GAParamTest {
     private static final int[] POPULATION_SIZES = new int[]{
             10,
             100,
-            1000
+            1000,
+            10000
     };
     private static final int MAX_GEN = 1000;
     private static final int REPETITIONS = 100;
@@ -35,15 +36,23 @@ class GAParamTest {
             "instance_15_uniform_1",
             "instance_30_uniform_1",
             "instance_60_uniform_1",
-//            "instance_15_daily_2",
-//            "instance_30_daily_2",
-//            "instance_60_daily_2",
-//            "instance_15_weekly_1",
-//            "instance_30_weekly_1",
-//            "instance_60_weekly_1",
-//            "instance_15_weekend_1",
-//            "instance_30_weekend_1",
-//            "instance_60_weekend_1",
+            "instance_90_uniform_1",
+            "instance_120_uniform_1",
+            "instance_15_daily_2",
+            "instance_30_daily_2",
+            "instance_60_daily_2",
+            "instance_90_daily_2",
+            "instance_120_daily_2",
+            "instance_15_weekly_1",
+            "instance_30_weekly_1",
+            "instance_60_weekly_1",
+            "instance_90_weekly_1",
+            "instance_120_weekly_1",
+            "instance_15_weekend_1",
+            "instance_30_weekend_1",
+            "instance_60_weekend_1",
+            "instance_90_weekend_1",
+            "instance_120_weekend_1",
     };
 
     @BeforeAll
@@ -58,12 +67,6 @@ class GAParamTest {
                 0.2,
                 0.8,
         };
-        for (final double psmProb : psmProbabilities) {
-            ALTERER_MAP.put("psm-" + psmProb, new SwapMutator<>(psmProb));
-        }
-        for (final double pmcProb : pmcProbabilities) {
-            ALTERER_MAP.put("pmc-" + pmcProb, new PartiallyMatchedCrossover<>(pmcProb));
-        }
         for (final double psmProb : psmProbabilities) {
             for (final double pmcProb : pmcProbabilities) {
                 ALTERER_MAP.put("psm-" + psmProb + "+" + "pmc-" + pmcProb,

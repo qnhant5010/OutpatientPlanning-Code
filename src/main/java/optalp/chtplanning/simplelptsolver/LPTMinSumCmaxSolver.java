@@ -10,8 +10,8 @@ public class LPTMinSumCmaxSolver extends FirstFitStrategyAllocator {
 
     @Override
     public MinimizingMakespanSolution solve(Param param,
-                          List<PatientCycleDemand> cycleDemands,
-                          List<Allocation> existingAllocations)
+                                            List<PatientCycleDemand> cycleDemands,
+                                            List<Allocation> existingAllocations)
             throws SolverException {
         this.param = param;
         solution = new MinimizingMakespanSolution(param.getNumTimeSlots());
@@ -23,14 +23,14 @@ public class LPTMinSumCmaxSolver extends FirstFitStrategyAllocator {
         return solution;
     }
 
-    private int getTotalLength(PatientCycleDemand cycleDemand) {
+    protected int getTotalLength(PatientCycleDemand cycleDemand) {
         return cycleDemand.getRdvDemands().stream().mapToInt(
                 rdvDemand -> (rdvDemand.isNeedingConsultation() ?
                         param.getConsultationLength() : 0)
                         + param.getInstallationLength()
                         + rdvDemand.getMedPrepDuration()
                         + rdvDemand.getTreatmentDuration()
-        ).sum();
+                                                            ).sum();
     }
 
 }
