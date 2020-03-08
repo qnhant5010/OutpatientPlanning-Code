@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * First fit strategy, using unordered list
+ * First fit strategy, using fifo list
  */
-public class FFS_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
+public class FF_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
     MinimizingMeanFlowTimeSolution solution;
 
     @Override

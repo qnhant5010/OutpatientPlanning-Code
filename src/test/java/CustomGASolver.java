@@ -12,7 +12,7 @@ import optalp.chtplanning.common.PatientCycleDemand;
 import optalp.chtplanning.common.SolverException;
 import optalp.chtplanning.common.solution.MinimizingMeanFlowTimeSolution;
 import optalp.chtplanning.simplegasolver.GASolver;
-import optalp.chtplanning.simplelptsolver.FFS_SumC_Solver;
+import optalp.chtplanning.simplelptsolver.FF_SumC_Solver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,9 +54,9 @@ public class CustomGASolver extends GASolver {
                         .collect(EvolutionResult.toBestGenotype()))
                 .asList();
         // Compile to solution
-        return new FFS_SumC_Solver().solve(param,
-                                           bestChromosome,
-                                           existingAllocations);
+        return new FF_SumC_Solver().solve(param,
+                                          bestChromosome,
+                                          existingAllocations);
     }
 
     public List<Integer> getBestObjectivesEvolution() {

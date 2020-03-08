@@ -5,10 +5,10 @@ import optalp.chtplanning.common.Solver;
 import optalp.chtplanning.common.SolverException;
 import optalp.chtplanning.common.objective.IntegerObjective;
 import optalp.chtplanning.common.solution.Solution;
-import optalp.chtplanning.simplelptsolver.LPT_FFS_SumC_Solver;
-import optalp.chtplanning.simplelptsolver.LiPT_FFS_SumC_Solver;
+import optalp.chtplanning.simplelptsolver.LPT_FF_SumC_Solver;
+import optalp.chtplanning.simplelptsolver.LIPT_FF_SumC_Solver;
 import optalp.chtplanning.simplelptsolver.SPT_FFS_SumC_Solver;
-import optalp.chtplanning.simplelptsolver.SiPT_FFS_SumC_Solver;
+import optalp.chtplanning.simplelptsolver.SIPT_FF_SumC_Solver;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -48,7 +48,7 @@ class SolverTest {
     @ParameterizedTest(name = "LPT_FFS - {index}: {0} {1} {2}")
     @MethodSource("getGeneratedDataset")
     void runLPTFFSSolver( int problemSize, String scenario, int testIndex) throws IOException {
-        runEachTest("LPT_FFS", new LPT_FFS_SumC_Solver(), problemSize, scenario, testIndex);
+        runEachTest("LPT_FFS", new LPT_FF_SumC_Solver(), problemSize, scenario, testIndex);
     }
 
     @ParameterizedTest(name = "SPT_FFS - {index}: {0} {1} {2}")
@@ -60,13 +60,13 @@ class SolverTest {
     @ParameterizedTest(name = "LiPT_FFS - {index}: {0} {1} {2}")
     @MethodSource("getGeneratedDataset")
     void runLiPTFFSSolver(int problemSize, String scenario, int testIndex) throws IOException {
-        runEachTest("LiPT_FFS", new LiPT_FFS_SumC_Solver(), problemSize, scenario, testIndex);
+        runEachTest("LiPT_FFS", new LIPT_FF_SumC_Solver(), problemSize, scenario, testIndex);
     }
 
     @ParameterizedTest(name = "SiPT_FFS - {index}: {0} {1} {2}")
     @MethodSource("getGeneratedDataset")
     void runSiPTFFSSolver(int problemSize, String scenario, int testIndex) throws IOException {
-        runEachTest("SiPT_FFS", new SiPT_FFS_SumC_Solver(), problemSize, scenario, testIndex);
+        runEachTest("SiPT_FFS", new SIPT_FF_SumC_Solver(), problemSize, scenario, testIndex);
     }
 
 //    @ParameterizedTest(name = "TR - {index}: {0} {1} {2}")

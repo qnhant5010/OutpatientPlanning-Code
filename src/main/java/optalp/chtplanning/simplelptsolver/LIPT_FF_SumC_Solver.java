@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Non-increasing order of ideal total processing time
  */
-public class LiPT_FFS_SumC_Solver extends FFS_SumC_Solver {
+public class LIPT_FF_SumC_Solver extends FF_SumC_Solver {
 
     @Override
     protected List<PatientCycleDemand> sortCycleDemands(List<PatientCycleDemand> unorderedList) {

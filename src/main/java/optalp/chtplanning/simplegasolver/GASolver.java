@@ -8,7 +8,7 @@ import io.jenetics.engine.*;
 import io.jenetics.util.ISeq;
 import optalp.chtplanning.common.*;
 import optalp.chtplanning.common.solution.MinimizingMeanFlowTimeSolution;
-import optalp.chtplanning.simplelptsolver.FFS_SumC_Solver;
+import optalp.chtplanning.simplelptsolver.FF_SumC_Solver;
 
 import java.util.List;
 
@@ -63,7 +63,7 @@ public class GASolver extends Solver<MinimizingMeanFlowTimeSolution> {
                             .collect(EvolutionResult.toBestGenotype())
             ).asList();
         // Compile to solution
-        FFS_SumC_Solver ffAllocator = new FFS_SumC_Solver();
+        FF_SumC_Solver ffAllocator = new FF_SumC_Solver();
         return ffAllocator.solve(
                 param,
                 bestChromosome,
@@ -72,7 +72,7 @@ public class GASolver extends Solver<MinimizingMeanFlowTimeSolution> {
     }
 
     protected Integer eval(final ISeq<PatientCycleDemand> cycleDemands) {
-        FFS_SumC_Solver ffAllocator = new FFS_SumC_Solver();
+        FF_SumC_Solver ffAllocator = new FF_SumC_Solver();
         try {
             return ffAllocator.solve(
                     param,

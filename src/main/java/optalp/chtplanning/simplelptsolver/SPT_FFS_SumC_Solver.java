@@ -5,7 +5,7 @@ import optalp.chtplanning.common.PatientCycleDemand;
 import java.util.Comparator;
 import java.util.List;
 
-public class SPT_FFS_SumC_Solver extends FFS_SumC_Solver {
+public class SPT_FFS_SumC_Solver extends FF_SumC_Solver {
 
     @Override
     protected List<PatientCycleDemand> sortCycleDemands(List<PatientCycleDemand> unorderedList) {
