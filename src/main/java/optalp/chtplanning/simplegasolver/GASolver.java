@@ -7,15 +7,15 @@ import io.jenetics.SwapMutator;
 import io.jenetics.engine.*;
 import io.jenetics.util.ISeq;
 import optalp.chtplanning.common.*;
-import optalp.chtplanning.common.solution.MinimizingMakespanSolution;
-import optalp.chtplanning.simplelptsolver.FirstFitStrategyAllocator;
+import optalp.chtplanning.common.solution.MinimizingMeanFlowTimeSolution;
+import optalp.chtplanning.simplelptsolver.FFS_SumC_Solver;
 
 import java.util.List;
 
 /**
  * Genetic algorithm with few population and generations
  */
-public class GASolver extends Solver<MinimizingMakespanSolution> {
+public class GASolver extends Solver<MinimizingMeanFlowTimeSolution> {
     protected List<Allocation> existingAllocations;
     private int POPULATION_SIZE;
     private int MAX_GEN;
@@ -32,9 +32,9 @@ public class GASolver extends Solver<MinimizingMakespanSolution> {
     protected GASolver() {}
 
     @Override
-    public MinimizingMakespanSolution solve(Param param,
-                                            List<PatientCycleDemand> cycleDemands,
-                                            List<Allocation> existingAllocations)
+    public MinimizingMeanFlowTimeSolution solve(Param param,
+                                                List<PatientCycleDemand> cycleDemands,
+                                                List<Allocation> existingAllocations)
             throws SolverException {
         this.param = param;
         this.existingAllocations = existingAllocations;
@@ -63,7 +63,7 @@ public class GASolver extends Solver<MinimizingMakespanSolution> {
                             .collect(EvolutionResult.toBestGenotype())
             ).asList();
         // Compile to solution
-        FirstFitStrategyAllocator ffAllocator = new FirstFitStrategyAllocator();
+        FFS_SumC_Solver ffAllocator = new FFS_SumC_Solver();
         return ffAllocator.solve(
                 param,
                 bestChromosome,
@@ -72,7 +72,7 @@ public class GASolver extends Solver<MinimizingMakespanSolution> {
     }
 
     protected Integer eval(final ISeq<PatientCycleDemand> cycleDemands) {
-        FirstFitStrategyAllocator ffAllocator = new FirstFitStrategyAllocator();
+        FFS_SumC_Solver ffAllocator = new FFS_SumC_Solver();
         try {
             return ffAllocator.solve(
                     param,

@@ -10,9 +10,9 @@ import optalp.chtplanning.common.Allocation;
 import optalp.chtplanning.common.Param;
 import optalp.chtplanning.common.PatientCycleDemand;
 import optalp.chtplanning.common.SolverException;
-import optalp.chtplanning.common.solution.MinimizingMakespanSolution;
+import optalp.chtplanning.common.solution.MinimizingMeanFlowTimeSolution;
 import optalp.chtplanning.simplegasolver.GASolver;
-import optalp.chtplanning.simplelptsolver.FirstFitStrategyAllocator;
+import optalp.chtplanning.simplelptsolver.FFS_SumC_Solver;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,9 +33,9 @@ public class CustomGASolver extends GASolver {
     }
 
     @Override
-    public MinimizingMakespanSolution solve(Param param,
-                                            List<PatientCycleDemand> cycleDemands,
-                                            List<Allocation> existingAllocations) throws SolverException {
+    public MinimizingMeanFlowTimeSolution solve(Param param,
+                                                List<PatientCycleDemand> cycleDemands,
+                                                List<Allocation> existingAllocations) throws SolverException {
         this.param = param;
         this.existingAllocations = existingAllocations;
         final Codec<ISeq<PatientCycleDemand>, EnumGene<PatientCycleDemand>> CODEC
@@ -54,9 +54,9 @@ public class CustomGASolver extends GASolver {
                         .collect(EvolutionResult.toBestGenotype()))
                 .asList();
         // Compile to solution
-        return new FirstFitStrategyAllocator().solve(param,
-                                                     bestChromosome,
-                                                     existingAllocations);
+        return new FFS_SumC_Solver().solve(param,
+                                           bestChromosome,
+                                           existingAllocations);
     }
 
     public List<Integer> getBestObjectivesEvolution() {

@@ -1,10 +1,10 @@
 package optalp.chtplanning.simplegasolver;
 
 import optalp.chtplanning.common.*;
-import optalp.chtplanning.common.solution.MinimizingMakespanSolution;
+import optalp.chtplanning.common.solution.MinimizingMeanFlowTimeSolution;
 import optalp.chtplanning.common.solution.Solution;
-import optalp.chtplanning.simplelptsolver.FirstFitStrategyAllocator;
-import optalp.chtplanning.simplelptsolver.LPTMinSumCmaxSolver;
+import optalp.chtplanning.simplelptsolver.FFS_SumC_Solver;
+import optalp.chtplanning.simplelptsolver.LPT_FFS_SumC_Solver;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 /**
  * Totally random genetic algorithm
  */
-public class TRSolver extends LPTMinSumCmaxSolver {
+public class TRSolver extends LPT_FFS_SumC_Solver {
     private final int SOLUTION_POOL_SIZE;
     private final Random RANDOMIZER;
 
@@ -23,9 +23,9 @@ public class TRSolver extends LPTMinSumCmaxSolver {
     }
 
     @Override
-    public MinimizingMakespanSolution solve(Param param,
-                                            List<PatientCycleDemand> cycleDemands,
-                                            List<Allocation> existingAllocations)
+    public MinimizingMeanFlowTimeSolution solve(Param param,
+                                                List<PatientCycleDemand> cycleDemands,
+                                                List<Allocation> existingAllocations)
             throws SolverException {
         Stream<List<PatientCycleDemand>> shuffledCycleDemands =
                 Stream.generate(() -> {
@@ -37,7 +37,7 @@ public class TRSolver extends LPTMinSumCmaxSolver {
         // Iterate
         return shuffledCycleDemands.limit(SOLUTION_POOL_SIZE).parallel()
                 .map(shuffledDemands -> {
-                    FirstFitStrategyAllocator fifoSolver = new FirstFitStrategyAllocator();
+                    FFS_SumC_Solver fifoSolver = new FFS_SumC_Solver();
                     try {
                         return fifoSolver.solve(param,
                                 shuffledDemands,

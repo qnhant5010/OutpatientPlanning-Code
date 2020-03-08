@@ -5,8 +5,10 @@ import optalp.chtplanning.common.Solver;
 import optalp.chtplanning.common.SolverException;
 import optalp.chtplanning.common.objective.IntegerObjective;
 import optalp.chtplanning.common.solution.Solution;
-import optalp.chtplanning.simplegasolver.GASolver;
-import optalp.chtplanning.simplelptsolver.LPTMinSumCmaxSolver;
+import optalp.chtplanning.simplelptsolver.LPT_FFS_SumC_Solver;
+import optalp.chtplanning.simplelptsolver.LiPT_FFS_SumC_Solver;
+import optalp.chtplanning.simplelptsolver.SPT_FFS_SumC_Solver;
+import optalp.chtplanning.simplelptsolver.SiPT_FFS_SumC_Solver;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,15 +24,11 @@ import java.util.List;
 import java.util.stream.Stream;
 
 class SolverTest {
-    private static LPTMinSumCmaxSolver lptSolver;
-    private static GASolver uGaSolver;
     private static RecordCSVWriter CSV_WRITER;
 
     @BeforeAll
     static void init() throws IOException {
         Utils.createDir();
-        lptSolver = new LPTMinSumCmaxSolver();
-        uGaSolver = new GASolver(10000, 0, 100);
         CSV_WRITER =
                 new RecordCSVWriter(GeneralConfig.SYNTHESIS_CSV_GETTER.get());
     }
@@ -47,10 +45,28 @@ class SolverTest {
         return arguments.stream();
     }
 
-    @ParameterizedTest(name = "LPT - {index}: {0} {1} {2}")
+    @ParameterizedTest(name = "LPT_FFS - {index}: {0} {1} {2}")
     @MethodSource("getGeneratedDataset")
-    void runLPTSolver(int problemSize, String scenario, int testIndex) throws IOException {
-        runEachTest("LPT", lptSolver, problemSize, scenario, testIndex);
+    void runLPTFFSSolver( int problemSize, String scenario, int testIndex) throws IOException {
+        runEachTest("LPT_FFS", new LPT_FFS_SumC_Solver(), problemSize, scenario, testIndex);
+    }
+
+    @ParameterizedTest(name = "SPT_FFS - {index}: {0} {1} {2}")
+    @MethodSource("getGeneratedDataset")
+    void runSPTFFSSolver(int problemSize, String scenario, int testIndex) throws IOException {
+        runEachTest("SPT_FFS", new SPT_FFS_SumC_Solver(), problemSize, scenario, testIndex);
+    }
+
+    @ParameterizedTest(name = "LiPT_FFS - {index}: {0} {1} {2}")
+    @MethodSource("getGeneratedDataset")
+    void runLiPTFFSSolver(int problemSize, String scenario, int testIndex) throws IOException {
+        runEachTest("LiPT_FFS", new LiPT_FFS_SumC_Solver(), problemSize, scenario, testIndex);
+    }
+
+    @ParameterizedTest(name = "SiPT_FFS - {index}: {0} {1} {2}")
+    @MethodSource("getGeneratedDataset")
+    void runSiPTFFSSolver(int problemSize, String scenario, int testIndex) throws IOException {
+        runEachTest("SiPT_FFS", new SiPT_FFS_SumC_Solver(), problemSize, scenario, testIndex);
     }
 
 //    @ParameterizedTest(name = "TR - {index}: {0} {1} {2}")
@@ -71,11 +87,11 @@ class SolverTest {
 //        runEachTest("HGA", hGaSolver, problemSize, scenario, testIndex);
 //    }
 
-    @ParameterizedTest(name = "UGA - {index}: {0} {1} {2}")
-    @MethodSource("getGeneratedDataset")
-    void runUltraGASolver(int problemSize, String scenario, int testIndex) throws IOException {
-        runEachTest("UGA", uGaSolver, problemSize, scenario, testIndex);
-    }
+//    @ParameterizedTest(name = "UGA - {index}: {0} {1} {2}")
+//    @MethodSource("getGeneratedDataset")
+//    void runUltraGASolver(int problemSize, String scenario, int testIndex) throws IOException {
+//        runEachTest("UGA", uGaSolver, problemSize, scenario, testIndex);
+//    }
 
     void runEachTest(
             String solverName,

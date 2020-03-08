@@ -1,28 +1,36 @@
 package optalp.chtplanning.simplelptsolver;
 
 import optalp.chtplanning.common.*;
-import optalp.chtplanning.common.solution.MinimizingMakespanSolution;
+import optalp.chtplanning.common.solution.MinimizingMeanFlowTimeSolution;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * First fit strategy
+ * First fit strategy, using unordered list
  */
-public class FirstFitStrategyAllocator extends Solver<MinimizingMakespanSolution> {
-    MinimizingMakespanSolution solution;
+public class FFS_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
+    MinimizingMeanFlowTimeSolution solution;
 
     @Override
-    public MinimizingMakespanSolution solve(Param param,
-                                            List<PatientCycleDemand> cycleDemands,
-                                            List<Allocation> existingAllocations)
+    public MinimizingMeanFlowTimeSolution solve(Param param,
+                                                List<PatientCycleDemand> cycleDemands,
+                                                List<Allocation> existingAllocations)
             throws SolverException {
         this.param = param;
-        solution = new MinimizingMakespanSolution(param.getNumTimeSlots());
+        solution = new MinimizingMeanFlowTimeSolution(param.getNumTimeSlots());
         initWorkloadWith(existingAllocations);
-        cycleDemands.forEach(this::allocate);
+        this.sortCycleDemands(new ArrayList<>(cycleDemands)).forEach(this::allocate);
         solution.deduceObjectiveValue();
         return solution;
+    }
+
+    /**
+     * @param unorderedList copy of input
+     * @return custom ordered list
+     */
+    protected List<PatientCycleDemand> sortCycleDemands(List<PatientCycleDemand> unorderedList) {
+        return unorderedList;
     }
 
     protected void allocate(PatientCycleDemand cycleDemand) throws SolverException {
@@ -67,16 +75,16 @@ public class FirstFitStrategyAllocator extends Solver<MinimizingMakespanSolution
      */
     protected Allocation tryBooking(PatientRdvDemand rdvDemand, int day) {
         Allocation allocation = Allocation.builder()
-                .sessionDay(day)
-                .sectorId(rdvDemand.getSectorId())
-                .build();
+                                          .sessionDay(day)
+                                          .sectorId(rdvDemand.getSectorId())
+                                          .build();
         // Define the last time slot we can start
         int latestStartSession = param.getNumTimeSlots()
-                - rdvDemand.getTreatmentDuration()
-                - (Math.max((rdvDemand.isMedPreparedSameDay() ? rdvDemand.getMedPrepDuration() : 0),
-                            param.getInstallationLength()
-                           ))
-                - (rdvDemand.isNeedingConsultation() ? param.getConsultationLength() : 0);
+                                 - rdvDemand.getTreatmentDuration()
+                                 - (Math.max((rdvDemand.isMedPreparedSameDay() ? rdvDemand.getMedPrepDuration() : 0),
+                                             param.getInstallationLength()
+                                            ))
+                                 - (rdvDemand.isNeedingConsultation() ? param.getConsultationLength() : 0);
         // Start to find the first plausible position
         for (int startSession = 0; startSession <= latestStartSession; startSession++) {
             allocation.startSession(startSession);
@@ -124,10 +132,10 @@ public class FirstFitStrategyAllocator extends Solver<MinimizingMakespanSolution
             for (medPrepDay = earliestMedPrepDay; medPrepDay <= day; medPrepDay++) {
                 medPrepStartTime = earliestMedPrepTime;
                 while (medPrepStartTime <= param.getNumTimeSlots() &&
-                        cannotRequirePharmacy(medPrepDay,
-                                              medPrepStartTime,
-                                              medPrepStartTime + rdvDemand.getMedPrepDuration()
-                                             ))
+                       cannotRequirePharmacy(medPrepDay,
+                                             medPrepStartTime,
+                                             medPrepStartTime + rdvDemand.getMedPrepDuration()
+                                            ))
                     medPrepStartTime++;
                 if (medPrepStartTime + rdvDemand.getMedPrepDuration() <= param.getNumTimeSlots())
                     break;
@@ -153,10 +161,10 @@ public class FirstFitStrategyAllocator extends Solver<MinimizingMakespanSolution
                 if (cannotRequireNurseInstalling(day,
                                                  allocation.startInstallation(),
                                                  allocation.endInstallation())
-                        || cannotRequireMaterial(day,
-                                                 allocation.startInstallation(),
-                                                 allocation.endInstallation()
-                                                ))
+                    || cannotRequireMaterial(day,
+                                             allocation.startInstallation(),
+                                             allocation.endInstallation()
+                                            ))
                     continue;
                 /////////////////////////////
                 // Check treatment step
@@ -172,7 +180,7 @@ public class FirstFitStrategyAllocator extends Solver<MinimizingMakespanSolution
                         || cannotRequireMaterial(day,
                                                  allocation.startTreatment(),
                                                  allocation.startTreatment() + rdvDemand.getTreatmentDuration()))
-                        && allocation.startTreatment() + rdvDemand.getTreatmentDuration() <= param.getNumTimeSlots())
+                       && allocation.startTreatment() + rdvDemand.getTreatmentDuration() <= param.getNumTimeSlots())
                     allocation.startTreatment(allocation.startTreatment() + 1);
                 allocation.endTreatment(allocation.startTreatment() + rdvDemand.getTreatmentDuration());
                 if (allocation.endTreatment() > param.getNumTimeSlots())
@@ -209,7 +217,7 @@ public class FirstFitStrategyAllocator extends Solver<MinimizingMakespanSolution
      * @param patientId   for who
      */
     protected void register(List<Allocation> allocations,
-                          long patientId) {
+                            long patientId) {
         solution.save(allocations, patientId);
         registerWorkload(allocations);
     }

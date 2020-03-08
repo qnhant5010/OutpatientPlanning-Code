@@ -22,12 +22,14 @@ class GeneralConfig {
     };
     static final int NUMBER_OF_TESTS = 10;
     static final int[] PROBLEM_SIZES = new int[]{
-//            15,
-//            30,
-//            60,
+            15,
+            30,
+            60,
             90,
             120,
-//            150
+            150,
+            180,
+            210
     };
     static final int TIME_SLOTS_PER_DAY = 22;
     static final int HORIZON_LENGTH = 28;

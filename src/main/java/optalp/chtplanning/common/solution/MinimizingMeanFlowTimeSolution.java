@@ -2,11 +2,11 @@ package optalp.chtplanning.common.solution;
 
 import optalp.chtplanning.common.objective.IntegerObjective;
 
-public class MinimizingMakespanSolution extends Solution<IntegerObjective> {
+public class MinimizingMeanFlowTimeSolution extends Solution<IntegerObjective> {
 
     private final int timeSlotsPerDay;
 
-    public MinimizingMakespanSolution(int timeSlotsPerDay) {
+    public MinimizingMeanFlowTimeSolution(int timeSlotsPerDay) {
         this.timeSlotsPerDay = timeSlotsPerDay;
     }
 
