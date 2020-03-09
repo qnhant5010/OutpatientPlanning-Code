@@ -3,8 +3,8 @@ package optalp.chtplanning.simplegasolver;
 import optalp.chtplanning.common.*;
 import optalp.chtplanning.common.solution.MinimizingMeanFlowTimeSolution;
 import optalp.chtplanning.common.solution.Solution;
-import optalp.chtplanning.simplelptsolver.FF_SumC_Solver;
-import optalp.chtplanning.simplelptsolver.LPT_FF_SumC_Solver;
+import optalp.chtplanning.heuristicsolver.FF_SumC_Solver;
+import optalp.chtplanning.heuristicsolver.LPT_FF_SumC_Solver;
 
 import java.util.*;
 import java.util.stream.Stream;

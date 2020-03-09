@@ -12,7 +12,7 @@ import optalp.chtplanning.common.PatientCycleDemand;
 import optalp.chtplanning.common.SolverException;
 import optalp.chtplanning.common.solution.MinimizingMeanFlowTimeSolution;
 import optalp.chtplanning.simplegasolver.GASolver;
-import optalp.chtplanning.simplelptsolver.FF_SumC_Solver;
+import optalp.chtplanning.heuristicsolver.FF_SumC_Solver;
 
 import java.util.ArrayList;
 import java.util.List;

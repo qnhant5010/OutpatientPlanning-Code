@@ -5,10 +5,10 @@ import optalp.chtplanning.common.Solver;
 import optalp.chtplanning.common.SolverException;
 import optalp.chtplanning.common.objective.IntegerObjective;
 import optalp.chtplanning.common.solution.Solution;
-import optalp.chtplanning.simplelptsolver.LPT_FF_SumC_Solver;
-import optalp.chtplanning.simplelptsolver.LIPT_FF_SumC_Solver;
-import optalp.chtplanning.simplelptsolver.SPT_FFS_SumC_Solver;
-import optalp.chtplanning.simplelptsolver.SIPT_FF_SumC_Solver;
+import optalp.chtplanning.heuristicsolver.LPT_FF_SumC_Solver;
+import optalp.chtplanning.heuristicsolver.LIPT_FF_SumC_Solver;
+import optalp.chtplanning.heuristicsolver.SPT_FF_SumC_Solver;
+import optalp.chtplanning.heuristicsolver.SIPT_FF_SumC_Solver;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -45,28 +45,28 @@ class SolverTest {
         return arguments.stream();
     }
 
-    @ParameterizedTest(name = "LPT_FFS - {index}: {0} {1} {2}")
+    @ParameterizedTest(name = "LPT_FF - {index}: {0} {1} {2}")
     @MethodSource("getGeneratedDataset")
-    void runLPTFFSSolver( int problemSize, String scenario, int testIndex) throws IOException {
-        runEachTest("LPT_FFS", new LPT_FF_SumC_Solver(), problemSize, scenario, testIndex);
+    void runLPTFFSolver( int problemSize, String scenario, int testIndex) throws IOException {
+        runEachTest("LPT_FF", new LPT_FF_SumC_Solver(), problemSize, scenario, testIndex);
     }
 
-    @ParameterizedTest(name = "SPT_FFS - {index}: {0} {1} {2}")
+    @ParameterizedTest(name = "SPT_FF - {index}: {0} {1} {2}")
     @MethodSource("getGeneratedDataset")
-    void runSPTFFSSolver(int problemSize, String scenario, int testIndex) throws IOException {
-        runEachTest("SPT_FFS", new SPT_FFS_SumC_Solver(), problemSize, scenario, testIndex);
+    void runSPTFFSolver(int problemSize, String scenario, int testIndex) throws IOException {
+        runEachTest("SPT_FF", new SPT_FF_SumC_Solver(), problemSize, scenario, testIndex);
     }
 
-    @ParameterizedTest(name = "LiPT_FFS - {index}: {0} {1} {2}")
+    @ParameterizedTest(name = "LPT_FF - {index}: {0} {1} {2}")
     @MethodSource("getGeneratedDataset")
-    void runLiPTFFSSolver(int problemSize, String scenario, int testIndex) throws IOException {
-        runEachTest("LiPT_FFS", new LIPT_FF_SumC_Solver(), problemSize, scenario, testIndex);
+    void runLIPTFFSolver(int problemSize, String scenario, int testIndex) throws IOException {
+        runEachTest("LIPT_FF", new LIPT_FF_SumC_Solver(), problemSize, scenario, testIndex);
     }
 
-    @ParameterizedTest(name = "SiPT_FFS - {index}: {0} {1} {2}")
+    @ParameterizedTest(name = "SIPT_FF - {index}: {0} {1} {2}")
     @MethodSource("getGeneratedDataset")
-    void runSiPTFFSSolver(int problemSize, String scenario, int testIndex) throws IOException {
-        runEachTest("SiPT_FFS", new SIPT_FF_SumC_Solver(), problemSize, scenario, testIndex);
+    void runSIPTFFSolver(int problemSize, String scenario, int testIndex) throws IOException {
+        runEachTest("SIPT_FF", new SIPT_FF_SumC_Solver(), problemSize, scenario, testIndex);
     }
 
 //    @ParameterizedTest(name = "TR - {index}: {0} {1} {2}")

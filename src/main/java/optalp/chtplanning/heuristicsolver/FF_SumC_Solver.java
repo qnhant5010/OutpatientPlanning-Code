@@ -1,4 +1,4 @@
-package optalp.chtplanning.simplelptsolver;
+package optalp.chtplanning.heuristicsolver;
 
 import optalp.chtplanning.common.*;
 import optalp.chtplanning.common.solution.MinimizingMeanFlowTimeSolution;

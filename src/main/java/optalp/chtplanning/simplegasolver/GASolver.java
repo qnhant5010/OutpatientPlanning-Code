@@ -8,7 +8,7 @@ import io.jenetics.engine.*;
 import io.jenetics.util.ISeq;
 import optalp.chtplanning.common.*;
 import optalp.chtplanning.common.solution.MinimizingMeanFlowTimeSolution;
-import optalp.chtplanning.simplelptsolver.FF_SumC_Solver;
+import optalp.chtplanning.heuristicsolver.FF_SumC_Solver;
 
 import java.util.List;
 
