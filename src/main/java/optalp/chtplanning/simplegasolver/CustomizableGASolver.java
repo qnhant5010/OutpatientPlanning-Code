@@ -1,3 +1,5 @@
+package optalp.chtplanning.simplegasolver;
+
 import io.jenetics.Alterer;
 import io.jenetics.EnumGene;
 import io.jenetics.Optimize;
@@ -11,21 +13,20 @@ import optalp.chtplanning.common.Param;
 import optalp.chtplanning.common.PatientCycleDemand;
 import optalp.chtplanning.common.SolverException;
 import optalp.chtplanning.common.solution.MinimizingMeanFlowTimeSolution;
-import optalp.chtplanning.simplegasolver.GASolver;
 import optalp.chtplanning.heuristicsolver.FF_SumC_Solver;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class CustomGASolver extends GASolver {
+public class CustomizableGASolver extends GASolver {
     private int populationSize;
     private int maxGen;
     private Alterer<EnumGene<PatientCycleDemand>, Integer> alterer;
     private List<Integer> bestObjectives;
 
-    CustomGASolver(int populationSize,
-                          int maxGen,
-                          Alterer<EnumGene<PatientCycleDemand>, Integer> alterer) {
+    public CustomizableGASolver(int populationSize,
+                                int maxGen,
+                                Alterer<EnumGene<PatientCycleDemand>, Integer> alterer) {
         this.populationSize = populationSize;
         this.maxGen = maxGen;
         this.bestObjectives = new ArrayList<>(maxGen);

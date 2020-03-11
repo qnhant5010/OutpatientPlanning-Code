@@ -5,6 +5,7 @@ import io.jenetics.PartiallyMatchedCrossover;
 import io.jenetics.SwapMutator;
 import optalp.chtplanning.common.Param;
 import optalp.chtplanning.common.PatientCycleDemand;
+import optalp.chtplanning.simplegasolver.CustomizableGASolver;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -102,7 +103,7 @@ class GAParamTest {
                                                       + ".txt")) {
             for (int i = 0; i < REPETITIONS; i++) {
                 System.out.println("Repetition " + (i + 1) + " of " + REPETITIONS);
-                CustomGASolver gaSolver = new CustomGASolver(populationSize, MAX_GEN, ALTERER_MAP.get(mutatorName));
+                CustomizableGASolver gaSolver = new CustomizableGASolver(populationSize, MAX_GEN, ALTERER_MAP.get(mutatorName));
                 gaSolver.solve(param, cycleDemands, new ArrayList<>());
                 pw.println(gaSolver.getBestObjectivesEvolution().stream().map(Object::toString).collect(Collectors.joining(",")));
             }
