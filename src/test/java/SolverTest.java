@@ -6,6 +6,7 @@ import optalp.chtplanning.common.SolverException;
 import optalp.chtplanning.common.objective.IntegerObjective;
 import optalp.chtplanning.common.solution.Solution;
 import optalp.chtplanning.heuristicsolver.*;
+import optalp.chtplanning.simplegasolver.SimpleGASolver;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,17 +18,30 @@ import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.stream.Stream;
 
 class SolverTest {
     private static RecordCSVWriter CSV_WRITER;
+    private static int RUN_MAX_ITERATION = 50;
+    public static final int[] POP_SIZES = new int[]{40, 80};
+    public static final int[] GEN_COUNTS = new int[]{25, 50};
+    private static Map<Integer, Executor> executorMap = new HashMap<>();
 
     @BeforeAll
     static void init() throws IOException {
         Utils.createDir();
         CSV_WRITER =
                 new RecordCSVWriter(GeneralConfig.SYNTHESIS_CSV_GETTER.get());
+        for (int threadCount = 0; threadCount < Runtime.getRuntime().availableProcessors(); threadCount = threadCount + 2) {
+            executorMap.put(threadCount,
+                            threadCount == 0 ? Executors.newSingleThreadExecutor()
+                                             : Executors.newFixedThreadPool(threadCount));
+        }
     }
 
     private static Stream<Arguments> getGeneratedDataset() {
@@ -36,6 +50,26 @@ class SolverTest {
             for (int problemSize : GeneralConfig.PROBLEM_SIZES) {
                 for (int testIndex = 1; testIndex <= GeneralConfig.NUMBER_OF_TESTS; testIndex++) {
                     arguments.add(Arguments.of(problemSize, scenario, testIndex));
+                }
+            }
+        }
+        return arguments.stream();
+    }
+
+    private static Stream<Arguments> getRepeatedGeneratedDataset() {
+        List<Arguments> arguments = new ArrayList<>();
+        for (String scenario : GeneralConfig.SCENARIO_SET) {
+            for (int problemSize : GeneralConfig.PROBLEM_SIZES) {
+                for (int testIndex = 1; testIndex <= GeneralConfig.NUMBER_OF_TESTS; testIndex++) {
+                    for (int genCount : GEN_COUNTS) {
+                        for (int popSize : POP_SIZES) {
+                            for (int threadCount = 0; threadCount < Runtime.getRuntime().availableProcessors(); threadCount = threadCount + 2) {
+                                for (int repeatIdx = 0; repeatIdx < RUN_MAX_ITERATION; repeatIdx++) {
+                                    arguments.add(Arguments.of(scenario, problemSize, testIndex, genCount, popSize, threadCount, repeatIdx));
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -73,7 +107,7 @@ class SolverTest {
                     new CIPT_FF_SumC_Solver(true, true),
                     problemSize,
                     scenario,
-                    testIndex);
+                    testIndex, true);
     }
 
     @ParameterizedTest(name = "CIPT_ID_FF - {index}: {0} {1} {2}")
@@ -83,7 +117,7 @@ class SolverTest {
                     new CIPT_FF_SumC_Solver(true, false),
                     problemSize,
                     scenario,
-                    testIndex);
+                    testIndex, true);
     }
 
     @ParameterizedTest(name = "CIPT_DI_FF - {index}: {0} {1} {2}")
@@ -93,7 +127,7 @@ class SolverTest {
                     new CIPT_FF_SumC_Solver(false, true),
                     problemSize,
                     scenario,
-                    testIndex);
+                    testIndex, true);
     }
 
     @ParameterizedTest(name = "CIPT_DD_FF - {index}: {0} {1} {2}")
@@ -103,7 +137,38 @@ class SolverTest {
                     new CIPT_FF_SumC_Solver(false, false),
                     problemSize,
                     scenario,
-                    testIndex);
+                    testIndex, true);
+    }
+
+    @ParameterizedTest(name = "GA - {index}: {0} {1} {2}")
+    @MethodSource("getGeneratedDataset")
+    void runSimpleGASolver(int problemSize, String scenario, int testIndex) throws IOException {
+        runEachTest("GA-40-25",
+                    new SimpleGASolver(40, 25, Executors.newWorkStealingPool()),
+                    problemSize,
+                    scenario,
+                    testIndex,
+                    true);
+    }
+
+    @ParameterizedTest(name = "GA - {index}: {1} {0} {2} p{3} g{4} t{5} r{6}")
+    @MethodSource("getRepeatedGeneratedDataset")
+    void runSimpleGASolverSensitivityTest(String scenario, int problemSize, int testIndex,
+                                          int popSize, int genCount, int threadCount, int runCount) throws IOException {
+        String solverName = "GA" +
+                            "-p" + popSize
+                            + "-g" + genCount
+                            + "-t" + (threadCount == 0 ? 1 : threadCount)
+                            + "-r" + (runCount + 1);
+        System.out.println(problemSize + " " + scenario + " " + testIndex + " " + solverName);
+        runEachTest(solverName,
+                    new SimpleGASolver(popSize,
+                                       genCount,
+                                       executorMap.get(threadCount)),
+                    problemSize,
+                    scenario,
+                    testIndex,
+                    false);
     }
 
 //    @ParameterizedTest(name = "TR - {index}: {0} {1} {2}")
@@ -133,8 +198,10 @@ class SolverTest {
     void runEachTest(
             String solverName,
             Solver<?> solver,
-            int problemSize, String scenario, int testIndex)
-    throws SolverException, IOException {
+            int problemSize,
+            String scenario,
+            int testIndex, boolean solutionOutput)
+            throws SolverException, IOException {
         assert solver != null;
         Instance instance = Utils.GSON.fromJson(new JsonReader(new FileReader(
                                                         GeneralConfig.getJsonInstanceFile(problemSize, scenario, testIndex)
@@ -170,8 +237,8 @@ class SolverTest {
             exception = e;
         }
         CSV_WRITER.write(record);
-        Utils.writeSolution(solverName, problemSize, scenario, testIndex, record, solution);
-        System.out.println(record);
+        if (solutionOutput)
+            Utils.writeSolution(solverName, problemSize, scenario, testIndex, record, solution);
         if (exception != null) throw exception;
     }
 

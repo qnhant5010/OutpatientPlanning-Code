@@ -5,7 +5,7 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 class GeneralConfig {
-    static final String PROJECT_DATA_DIR = System.getProperty("user.home") + File.separator + "OptaSolver";
+    static final String PROJECT_DATA_DIR = System.getProperty("user.home") + File.separator + "ChiPlanAnalytic";
     static final String INSTANCE_DIR = PROJECT_DATA_DIR + File.separator + "instance";
     static final String RESULT_DIR = PROJECT_DATA_DIR + File.separator + "result";
     private static final String JSON_FORMAT = ".json";
