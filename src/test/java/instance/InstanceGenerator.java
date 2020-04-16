@@ -1,8 +1,12 @@
+package instance;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import config.GeneralConfig;
 import optalp.chtplanning.common.Param;
 import optalp.chtplanning.common.PatientCycleDemand;
 import optalp.chtplanning.common.PatientRdvDemand;
+import utils.CPLexDataWriter;
 
 import java.io.FileWriter;
 import java.io.IOException;

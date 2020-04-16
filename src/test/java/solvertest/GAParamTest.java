@@ -1,4 +1,8 @@
+package solvertest;
+
 import com.google.gson.stream.JsonReader;
+import config.GeneralConfig;
+import instance.Instance;
 import io.jenetics.Alterer;
 import io.jenetics.EnumGene;
 import io.jenetics.PartiallyMatchedCrossover;
@@ -10,6 +14,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import utils.Utils;
 
 import java.io.File;
 import java.io.FileNotFoundException;

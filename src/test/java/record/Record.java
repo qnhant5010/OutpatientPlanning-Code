@@ -1,8 +1,10 @@
+package record;
+
 import lombok.Value;
 import optalp.chtplanning.common.objective.Objective;
 
 @Value
-class Record {
+public class Record {
     String solverName;
     int problemSize;
     String scenario;

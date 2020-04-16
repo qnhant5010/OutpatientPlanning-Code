@@ -1,4 +1,8 @@
+package solvertest;
+
 import com.google.gson.stream.JsonReader;
+import config.GeneralConfig;
+import instance.Instance;
 import optalp.chtplanning.common.Param;
 import optalp.chtplanning.common.PatientCycleDemand;
 import optalp.chtplanning.common.Solver;
@@ -12,6 +16,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import record.Record;
+import record.RecordCSVWriter;
+import utils.Utils;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -27,10 +34,10 @@ import java.util.stream.Stream;
 
 class SolverTest {
     private static RecordCSVWriter CSV_WRITER;
-    private static int RUN_MAX_ITERATION = 50;
+    private static final int RUN_MAX_ITERATION = 50;
     public static final int[] POP_SIZES = new int[]{40, 80};
     public static final int[] GEN_COUNTS = new int[]{25, 50};
-    private static Map<Integer, Executor> executorMap = new HashMap<>();
+    private static final Map<Integer, Executor> executorMap = new HashMap<>();
 
     @BeforeAll
     static void init() throws IOException {
