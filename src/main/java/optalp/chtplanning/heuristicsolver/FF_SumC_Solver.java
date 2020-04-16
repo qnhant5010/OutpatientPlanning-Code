@@ -81,10 +81,10 @@ public class FF_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
         // Define the last time slot we can start
         int latestStartSession = param.getNumTimeSlots()
                                  - rdvDemand.getTreatmentDuration()
-                                 - (Math.max((rdvDemand.isMedPreparedSameDay() ? rdvDemand.getMedPrepDuration() : 0),
-                                             param.getInstallationLength()
+                                 - (Math.max((rdvDemand.isDrugMixingSameDay() ? rdvDemand.getDrugMixingDuration() : 0),
+                                             rdvDemand.getInstallationDuration()
                                             ))
-                                 - (rdvDemand.isNeedingConsultation() ? param.getConsultationLength() : 0);
+                                 - rdvDemand.getConsultationDuration();
         // Start to find the first plausible position
         for (int startSession = 0; startSession <= latestStartSession; startSession++) {
             allocation.startSession(startSession);
@@ -92,15 +92,12 @@ public class FF_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
             // Check consultation step
             // Start the consultation as soon as a suitable doctor is available
             allocation.startConsultation(startSession);
-            if (rdvDemand.isNeedingConsultation()) {
-                if (cannotRequireDoctor(rdvDemand.getSectorId(),
-                                        day,
-                                        startSession,
-                                        startSession + param.getConsultationLength()))
-                    continue;
-                allocation.endConsultation(startSession + param.getConsultationLength());
-            } else
-                allocation.endConsultation(startSession);
+            if (cannotRequireDoctor(rdvDemand.getSectorId(),
+                                    day,
+                                    startSession,
+                                    startSession + rdvDemand.getConsultationDuration()))
+                continue;
+            allocation.endConsultation(startSession + rdvDemand.getConsultationDuration());
             //            // If no consultation, then patient should not wait until both
             //            // nurse and material is available
             //            if (!rdvDemand.isNeedingConsultation() &&
@@ -116,7 +113,7 @@ public class FF_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
             /////////////////////////////
             // Check med preparation step
             int earliestMedPrepDay, earliestMedPrepTime;
-            if (rdvDemand.isMedPreparedSameDay()) {
+            if (rdvDemand.isDrugMixingSameDay()) {
                 // If prepare same day,
                 // The earliest start is after consultation
                 earliestMedPrepDay = day;
@@ -134,26 +131,26 @@ public class FF_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
                 while (medPrepStartTime <= param.getNumTimeSlots() &&
                        cannotRequirePharmacy(medPrepDay,
                                              medPrepStartTime,
-                                             medPrepStartTime + rdvDemand.getMedPrepDuration()
+                                             medPrepStartTime + rdvDemand.getDrugMixingDuration()
                                             ))
                     medPrepStartTime++;
-                if (medPrepStartTime + rdvDemand.getMedPrepDuration() <= param.getNumTimeSlots())
+                if (medPrepStartTime + rdvDemand.getDrugMixingDuration() <= param.getNumTimeSlots())
                     break;
             }
             // If pharmacy is not available for the day before nor this day,
             // no way this booking is possible
-            if (medPrepStartTime + rdvDemand.getMedPrepDuration() > param.getNumTimeSlots())
+            if (medPrepStartTime + rdvDemand.getDrugMixingDuration() > param.getNumTimeSlots())
                 return null;
             allocation.medPrepDay(medPrepDay);
             allocation.startMedPrep(medPrepStartTime);
-            allocation.endMedPrep(medPrepStartTime + rdvDemand.getMedPrepDuration());
+            allocation.endMedPrep(medPrepStartTime + rdvDemand.getDrugMixingDuration());
             /////////////////////////////
             // A patient will occupy a material from start of installation to
             // end of treatment
             allocation.startInstallation(allocation.endConsultation() - 1);
             do {
                 allocation.startInstallation(allocation.startInstallation() + 1);
-                allocation.endInstallation(allocation.startInstallation() + param.getInstallationLength());
+                allocation.endInstallation(allocation.startInstallation() + rdvDemand.getInstallationDuration());
                 if (allocation.endInstallation() > param.getNumTimeSlots())
                     return null;
                 // Check installation step

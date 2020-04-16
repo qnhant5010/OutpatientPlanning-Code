@@ -38,13 +38,11 @@ public class CIPT_FF_SumC_Solver extends FF_SumC_Solver {
 
     protected int getIdealTotalLength(PatientCycleDemand cycleDemand) {
         return cycleDemand.getRdvDemands().stream().mapToInt(
-                rdvDemand -> (rdvDemand.isNeedingConsultation()
-                              ? param.getConsultationLength()
-                              : 0)
-                             + (rdvDemand.isMedPreparedSameDay()
-                                ? Math.max(param.getInstallationLength(),
-                                           rdvDemand.getMedPrepDuration())
-                                : param.getInstallationLength())
+                rdvDemand -> rdvDemand.getConsultationDuration()
+                             + (rdvDemand.isDrugMixingSameDay()
+                                ? Math.max(rdvDemand.getInstallationDuration(),
+                                           rdvDemand.getDrugMixingDuration())
+                                : rdvDemand.getInstallationDuration())
                              + rdvDemand.getTreatmentDuration()
                                                             ).sum();
     }

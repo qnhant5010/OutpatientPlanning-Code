@@ -21,14 +21,6 @@ public class Param {
     int multitasks;
     int numMaterials;
     /**
-     * Multiple of time slots
-     */
-    int consultationLength;
-    /**
-     * Multiple of time slots
-     */
-    int installationLength;
-    /**
      * Nurses capacity, should be multiplied by {@link #multitasks}
      */
     int[][] nurses;

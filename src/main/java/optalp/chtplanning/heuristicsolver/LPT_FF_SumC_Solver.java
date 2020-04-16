@@ -18,10 +18,9 @@ public class LPT_FF_SumC_Solver extends FF_SumC_Solver {
 
     protected int getTotalLength(PatientCycleDemand cycleDemand) {
         return cycleDemand.getRdvDemands().stream().mapToInt(
-                rdvDemand -> (rdvDemand.isNeedingConsultation() ?
-                        param.getConsultationLength() : 0)
-                        + param.getInstallationLength()
-                        + rdvDemand.getMedPrepDuration()
+                rdvDemand -> rdvDemand.getConsultationDuration()
+                        + rdvDemand.getInstallationDuration()
+                        + rdvDemand.getDrugMixingDuration()
                         + rdvDemand.getTreatmentDuration()
                                                             ).sum();
     }

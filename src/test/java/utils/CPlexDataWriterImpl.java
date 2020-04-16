@@ -31,8 +31,6 @@ public class CPlexDataWriterImpl extends PrintWriter implements CPlexDataWriter 
         cprint("N_H", param.getNumTimeSlots());
         cprint("N_D", param.getSectorIds().size());
         cprint("y", param.getMultitasks());
-        cprint("a", param.getConsultationLength());
-        cprint("b", param.getInstallationLength());
         cprint("D", param.getDoctors().get(0L));
         cprint("M", param.getNumMaterials());
         cprint("I", param.getNurses());
@@ -54,7 +52,7 @@ public class CPlexDataWriterImpl extends PrintWriter implements CPlexDataWriter 
               );
         cprint("p_C",
                patientCycleDemands.stream()
-                       .map(cycleDemand -> cycleDemand.getRdvDemands().get(0).getMedPrepDuration())
+                       .map(cycleDemand -> cycleDemand.getRdvDemands().get(0).getDrugMixingDuration())
                        .collect(Collectors.toList())
               );
         cprint("p_D",
@@ -75,7 +73,7 @@ public class CPlexDataWriterImpl extends PrintWriter implements CPlexDataWriter 
                patientCycleDemands.stream()
                        .map(cycleDemand ->
                                     cycleDemand.getRdvDemands().stream()
-                                            .mapToInt(rdvDemand -> rdvDemand.isNeedingConsultation() ? 1 : 0)
+                                            .mapToInt(rdvDemand -> rdvDemand.getConsultationDuration() > 0 ? 1 : 0)
                                             .toArray()
                            )
                        .toArray()
@@ -84,7 +82,7 @@ public class CPlexDataWriterImpl extends PrintWriter implements CPlexDataWriter 
                patientCycleDemands.stream()
                        .map(cycleDemand ->
                                     cycleDemand.getRdvDemands().stream()
-                                            .mapToInt(rdvDemand -> rdvDemand.isMedPreparedSameDay() ? 0 : 1)
+                                            .mapToInt(rdvDemand -> rdvDemand.isDrugMixingSameDay() ? 0 : 1)
                                             .toArray()
                            )
                        .toArray()

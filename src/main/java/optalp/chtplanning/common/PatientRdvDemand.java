@@ -1,7 +1,6 @@
 package optalp.chtplanning.common;
 
-import lombok.Builder;
-import lombok.Value;
+import lombok.*;
 
 /**
  * Per patient's demand
@@ -9,7 +8,8 @@ import lombok.Value;
 @Value
 @Builder
 public class PatientRdvDemand {
-    int id;
+    @NonNull
+    Integer id;
     /**
      * 0 means no speciality required
      */
@@ -17,15 +17,33 @@ public class PatientRdvDemand {
     /**
      * In days
      */
-    int afterLastRequest;
-    boolean needingConsultation;
-    boolean medPreparedSameDay;
+    @NonNull
+    Integer afterLastRequest;
     /**
      * In minutes
      */
-    int medPrepDuration;
+    @NonNull
+    Integer consultationDuration;
     /**
      * In minutes
      */
-    int treatmentDuration;
+    @NonNull
+    Integer installationDuration;
+    @NonNull
+    @Getter(AccessLevel.NONE)
+    Boolean drugMixingSameDay;
+    /**
+     * In minutes
+     */
+    @NonNull
+    Integer drugMixingDuration;
+    /**
+     * In minutes
+     */
+    @NonNull
+    Integer treatmentDuration;
+
+    public Boolean isDrugMixingSameDay() {
+        return drugMixingSameDay;
+    }
 }

@@ -15,9 +15,14 @@ import java.io.Writer;
 import java.util.*;
 import java.util.function.Supplier;
 
+/**
+ * v1 instance generator
+ */
 public class InstanceGenerator {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final int CONSULTATION_LENGTH = 1;
+    private static final int INSTALLATION_LENGTH = 1;
 
     public static void main(String[] args) throws Exception {
         Utils.createDir();
@@ -67,16 +72,15 @@ public class InstanceGenerator {
                 PatientRdvDemand rdvDemand = PatientRdvDemand.builder()
                                                              .id(i)
                                                              .treatmentDuration(treatmentDuration)
-                                                             .medPrepDuration(medPrepDuration)
-                                                             .medPreparedSameDay(GeneralConfig.randomTrueFalse())
+                                                             .drugMixingDuration(medPrepDuration)
+                                                             .drugMixingSameDay(GeneralConfig.randomTrueFalse())
                                                              .afterLastRequest(i == 0 ? 0 : GeneralConfig.randomPick(GeneralConfig.RDV_DELAYS))
-                                                             .needingConsultation(
-                                                                     //                                sectorId != 0 &&
-                                                                     GeneralConfig.randomTrueFalse())
+                                                             .consultationDuration(GeneralConfig.randomTrueFalse()
+                                                                                   ? CONSULTATION_LENGTH
+                                                                                   : 0)
+                                                             .installationDuration(INSTALLATION_LENGTH)
                                                              .sectorId(sectorId)
                                                              .build();
-                //                if (rdvDemand.isNeedingConsultation())
-                //                    rdvDemand.setMedPreparedSameDay(true);
                 rdvDemandList.add(rdvDemand);
             }
             demands.add(PatientCycleDemand.builder()
@@ -111,8 +115,6 @@ public class InstanceGenerator {
             }
         }
         return Param.builder()
-                    .consultationLength(1)
-                    .installationLength(1)
                     .days(GeneralConfig.HORIZON_LENGTH)
                     .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
                     .multitasks(GeneralConfig.MULTITASK)
@@ -149,8 +151,6 @@ public class InstanceGenerator {
             }
         }
         return Param.builder()
-                    .consultationLength(1)
-                    .installationLength(1)
                     .days(GeneralConfig.HORIZON_LENGTH)
                     .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
                     .multitasks(GeneralConfig.MULTITASK)
@@ -193,8 +193,6 @@ public class InstanceGenerator {
             System.arraycopy(pharmacy[i % 7], 0, pharmacy[i], 0, GeneralConfig.TIME_SLOTS_PER_DAY);
         }
         return Param.builder()
-                    .consultationLength(1)
-                    .installationLength(1)
                     .days(GeneralConfig.HORIZON_LENGTH)
                     .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
                     .multitasks(GeneralConfig.MULTITASK)
@@ -232,8 +230,6 @@ public class InstanceGenerator {
             }
         }
         return Param.builder()
-                    .consultationLength(1)
-                    .installationLength(1)
                     .days(GeneralConfig.HORIZON_LENGTH)
                     .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
                     .multitasks(GeneralConfig.MULTITASK)
