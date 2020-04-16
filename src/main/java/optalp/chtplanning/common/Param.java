@@ -1,35 +1,37 @@
 package optalp.chtplanning.common;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
 
 import java.util.Map;
 import java.util.Set;
 
-@Data
+@Value
+@Builder
 public class Param {
     /**
      * Count from 0 to <tt>days</tt>
      */
-    private int days;
+    int days;
     /**
      * Count from 1 to <tt>numTimeSlots + 1</tt>
      */
-    private int numTimeSlots;
-    private Set<Long> sectorIds;
-    private int multitasks;
-    private int numMaterials;
+    int numTimeSlots;
+    Set<Long> sectorIds;
+    int multitasks;
+    int numMaterials;
     /**
      * Multiple of time slots
      */
-    private int consultationLength;
+    int consultationLength;
     /**
      * Multiple of time slots
      */
-    private int installationLength;
+    int installationLength;
     /**
      * Nurses capacity, should be multiplied by {@link #multitasks}
      */
-    private int[][] nurses;
-    private Map<Long, int[][]> doctors;
-    private boolean[][] pharmacy;
+    int[][] nurses;
+    Map<Long, int[][]> doctors;
+    boolean[][] pharmacy;
 }

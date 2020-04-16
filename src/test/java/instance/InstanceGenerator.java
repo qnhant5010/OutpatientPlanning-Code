@@ -90,14 +90,6 @@ public class InstanceGenerator {
     }
 
     private static Param generateUniformParam() {
-        Param param = new Param();
-        param.setConsultationLength(1);
-        param.setInstallationLength(1);
-        param.setDays(GeneralConfig.HORIZON_LENGTH);
-        param.setNumTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY);
-        param.setMultitasks(GeneralConfig.MULTITASK);
-        param.setNumMaterials(GeneralConfig.MATERIALS);
-        param.setSectorIds(Collections.singleton(0L));
         final Map<Long, int[][]> doctors = new HashMap<>();
         final int[][] doctorsSector0 = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 1; i <= GeneralConfig.HORIZON_LENGTH; i++) {
@@ -106,33 +98,33 @@ public class InstanceGenerator {
             }
         }
         doctors.put(0L, doctorsSector0);
-        param.setDoctors(doctors);
         final int[][] nurses = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 1; i <= GeneralConfig.HORIZON_LENGTH; i++) {
             for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
                 nurses[i][j] = GeneralConfig.randomPick(GeneralConfig.MAX_NURSES + 1);
             }
         }
-        param.setNurses(nurses);
         final boolean[][] pharmacy = new boolean[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i <= GeneralConfig.HORIZON_LENGTH; i++) {
             for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
                 pharmacy[i][j] = GeneralConfig.randomTrueFalse();
             }
         }
-        param.setPharmacy(pharmacy);
-        return param;
+        return Param.builder()
+                    .consultationLength(1)
+                    .installationLength(1)
+                    .days(GeneralConfig.HORIZON_LENGTH)
+                    .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
+                    .multitasks(GeneralConfig.MULTITASK)
+                    .numMaterials(GeneralConfig.MATERIALS)
+                    .sectorIds(Collections.singleton(0L))
+                    .doctors(doctors)
+                    .nurses(nurses)
+                    .pharmacy(pharmacy)
+                    .build();
     }
 
     private static Param generateDailyParam() {
-        Param param = new Param();
-        param.setConsultationLength(1);
-        param.setInstallationLength(1);
-        param.setDays(GeneralConfig.HORIZON_LENGTH);
-        param.setNumTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY);
-        param.setMultitasks(GeneralConfig.MULTITASK);
-        param.setNumMaterials(GeneralConfig.MATERIALS);
-        param.setSectorIds(Collections.singleton(0L));
         final Map<Long, int[][]> doctors = new HashMap<>();
         final int[][] doctorsSector0 = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i < GeneralConfig.TIME_SLOTS_PER_DAY; i++) {
@@ -142,7 +134,6 @@ public class InstanceGenerator {
             }
         }
         doctors.put(0L, doctorsSector0);
-        param.setDoctors(doctors);
         final int[][] nurses = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i < GeneralConfig.TIME_SLOTS_PER_DAY; i++) {
             final int numNurses = GeneralConfig.randomPick(GeneralConfig.MAX_NURSES + 1);
@@ -150,7 +141,6 @@ public class InstanceGenerator {
                 nurses[j][i] = numNurses;
             }
         }
-        param.setNurses(nurses);
         final boolean[][] pharmacy = new boolean[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i < GeneralConfig.TIME_SLOTS_PER_DAY; i++) {
             final boolean open = GeneralConfig.randomTrueFalse();
@@ -158,19 +148,21 @@ public class InstanceGenerator {
                 pharmacy[j][i] = open;
             }
         }
-        param.setPharmacy(pharmacy);
-        return param;
+        return Param.builder()
+                    .consultationLength(1)
+                    .installationLength(1)
+                    .days(GeneralConfig.HORIZON_LENGTH)
+                    .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
+                    .multitasks(GeneralConfig.MULTITASK)
+                    .numMaterials(GeneralConfig.MATERIALS)
+                    .sectorIds(Collections.singleton(0L))
+                    .doctors(doctors)
+                    .nurses(nurses)
+                    .pharmacy(pharmacy)
+                    .build();
     }
 
     private static Param generateWeeklyParam() {
-        Param param = new Param();
-        param.setConsultationLength(1);
-        param.setInstallationLength(1);
-        param.setDays(GeneralConfig.HORIZON_LENGTH);
-        param.setNumTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY);
-        param.setMultitasks(GeneralConfig.MULTITASK);
-        param.setNumMaterials(GeneralConfig.MATERIALS);
-        param.setSectorIds(Collections.singleton(0L));
         final Map<Long, int[][]> doctors = new HashMap<>();
         final int[][] doctorsSector0 = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i < Math.min(7, GeneralConfig.HORIZON_LENGTH); i++) {
@@ -182,7 +174,6 @@ public class InstanceGenerator {
             System.arraycopy(doctorsSector0[i % 7], 0, doctorsSector0[i], 0, GeneralConfig.TIME_SLOTS_PER_DAY);
         }
         doctors.put(0L, doctorsSector0);
-        param.setDoctors(doctors);
         final int[][] nurses = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i < Math.min(7, GeneralConfig.HORIZON_LENGTH); i++) {
             for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
@@ -192,7 +183,6 @@ public class InstanceGenerator {
         for (int i = 7; i < Math.max(7, GeneralConfig.HORIZON_LENGTH); i++) {
             System.arraycopy(nurses[i % 7], 0, nurses[i], 0, GeneralConfig.TIME_SLOTS_PER_DAY);
         }
-        param.setNurses(nurses);
         final boolean[][] pharmacy = new boolean[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i < Math.min(7, GeneralConfig.HORIZON_LENGTH); i++) {
             for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
@@ -202,20 +192,22 @@ public class InstanceGenerator {
         for (int i = 7; i < Math.max(7, GeneralConfig.HORIZON_LENGTH); i++) {
             System.arraycopy(pharmacy[i % 7], 0, pharmacy[i], 0, GeneralConfig.TIME_SLOTS_PER_DAY);
         }
-        param.setPharmacy(pharmacy);
-        return param;
+        return Param.builder()
+                    .consultationLength(1)
+                    .installationLength(1)
+                    .days(GeneralConfig.HORIZON_LENGTH)
+                    .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
+                    .multitasks(GeneralConfig.MULTITASK)
+                    .numMaterials(GeneralConfig.MATERIALS)
+                    .sectorIds(Collections.singleton(0L))
+                    .doctors(doctors)
+                    .nurses(nurses)
+                    .pharmacy(pharmacy)
+                    .build();
     }
 
     private static Param generateWeekendParam() {
         int today = GeneralConfig.randomPick(7);
-        Param param = new Param();
-        param.setConsultationLength(1);
-        param.setInstallationLength(1);
-        param.setDays(GeneralConfig.HORIZON_LENGTH);
-        param.setNumTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY);
-        param.setMultitasks(GeneralConfig.MULTITASK);
-        param.setNumMaterials(GeneralConfig.MATERIALS);
-        param.setSectorIds(Collections.singleton(0L));
         final Map<Long, int[][]> doctors = new HashMap<>();
         final int[][] doctorsSector0 = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i <= GeneralConfig.HORIZON_LENGTH; i++) {
@@ -225,7 +217,6 @@ public class InstanceGenerator {
             }
         }
         doctors.put(0L, doctorsSector0);
-        param.setDoctors(doctors);
         final int[][] nurses = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i <= GeneralConfig.HORIZON_LENGTH; i++) {
             if (isWeekend(i + today)) continue;
@@ -233,7 +224,6 @@ public class InstanceGenerator {
                 nurses[i][j] = GeneralConfig.randomPick(GeneralConfig.MAX_NURSES + 1);
             }
         }
-        param.setNurses(nurses);
         final boolean[][] pharmacy = new boolean[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i <= GeneralConfig.HORIZON_LENGTH; i++) {
             if (isWeekend(i + today)) continue;
@@ -241,8 +231,18 @@ public class InstanceGenerator {
                 pharmacy[i][j] = GeneralConfig.randomTrueFalse();
             }
         }
-        param.setPharmacy(pharmacy);
-        return param;
+        return Param.builder()
+                    .consultationLength(1)
+                    .installationLength(1)
+                    .days(GeneralConfig.HORIZON_LENGTH)
+                    .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
+                    .multitasks(GeneralConfig.MULTITASK)
+                    .numMaterials(GeneralConfig.MATERIALS)
+                    .sectorIds(Collections.singleton(0L))
+                    .doctors(doctors)
+                    .nurses(nurses)
+                    .pharmacy(pharmacy)
+                    .build();
     }
 
     /**
