@@ -21,7 +21,7 @@ public class Param {
     int multitasks;
     int numMaterials;
     /**
-     * Nurses capacity, should be multiplied by {@link #multitasks}
+     * Nurses, should be multiplied by {@link #multitasks} to calculate capacity
      */
     int[][] nurses;
     Map<Long, int[][]> doctors;
