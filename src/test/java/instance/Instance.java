@@ -1,15 +1,13 @@
 package instance;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Value;
 import optalp.chtplanning.common.Param;
 import optalp.chtplanning.common.PatientCycleDemand;
 
 import java.util.List;
 
-@Data
-@AllArgsConstructor
+@Value
 public class Instance {
-    private Param param;
-    private List<PatientCycleDemand> demands;
+    Param param;
+    List<PatientCycleDemand> demands;
 }

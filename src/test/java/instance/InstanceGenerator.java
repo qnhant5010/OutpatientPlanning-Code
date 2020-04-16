@@ -6,19 +6,20 @@ import config.GeneralConfig;
 import optalp.chtplanning.common.Param;
 import optalp.chtplanning.common.PatientCycleDemand;
 import optalp.chtplanning.common.PatientRdvDemand;
-import utils.CPLexDataWriter;
+import utils.CPlexDataWriter;
+import utils.CPlexDataWriterImpl;
+import utils.Utils;
 
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.Writer;
 import java.util.*;
 import java.util.function.Supplier;
 
 public class InstanceGenerator {
 
-    private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws Exception {
         Utils.createDir();
         final Map<String, Supplier<Param>> SCENARIO_GENERATORS = new HashMap<>();
         SCENARIO_GENERATORS.put("uniform", InstanceGenerator::generateUniformParam);
@@ -39,7 +40,7 @@ public class InstanceGenerator {
                         gson.toJson(instance, writer);
                     }
                     // cplex dat
-                    try (CPLexDataWriter writer = new CPLexDataWriter(GeneralConfig.getDatInstanceFile(problemSize, scenario, testIndex))) {
+                    try (CPlexDataWriter writer = new CPlexDataWriterImpl(GeneralConfig.getDatInstanceFile(problemSize, scenario, testIndex))) {
                         writer.cprint(instance);
                     }
                 }
@@ -52,8 +53,6 @@ public class InstanceGenerator {
         int actualNumRequest = 0;
         long cycleId = 0;
         while (actualNumRequest < numRdv) {
-            PatientCycleDemand patientDemand = new PatientCycleDemand();
-            patientDemand.setId(cycleId);
             int size = GeneralConfig.randomPick(GeneralConfig.CYCLE_DEMANDS_PER_PATIENT);
             if (actualNumRequest + size > numRdv)
                 size = numRdv - actualNumRequest;
@@ -66,22 +65,24 @@ public class InstanceGenerator {
             List<PatientRdvDemand> rdvDemandList = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
                 PatientRdvDemand rdvDemand = PatientRdvDemand.builder()
-                        .id(i)
-                        .treatmentDuration(treatmentDuration)
-                        .medPrepDuration(medPrepDuration)
-                        .medPreparedSameDay(GeneralConfig.randomTrueFalse())
-                        .afterLastRequest(i == 0 ? 0 : GeneralConfig.randomPick(GeneralConfig.RDV_DELAYS))
-                        .needingConsultation(
-                                //                                sectorId != 0 &&
-                                GeneralConfig.randomTrueFalse())
-                        .sectorId(sectorId)
-                        .build();
+                                                             .id(i)
+                                                             .treatmentDuration(treatmentDuration)
+                                                             .medPrepDuration(medPrepDuration)
+                                                             .medPreparedSameDay(GeneralConfig.randomTrueFalse())
+                                                             .afterLastRequest(i == 0 ? 0 : GeneralConfig.randomPick(GeneralConfig.RDV_DELAYS))
+                                                             .needingConsultation(
+                                                                     //                                sectorId != 0 &&
+                                                                     GeneralConfig.randomTrueFalse())
+                                                             .sectorId(sectorId)
+                                                             .build();
                 //                if (rdvDemand.isNeedingConsultation())
                 //                    rdvDemand.setMedPreparedSameDay(true);
                 rdvDemandList.add(rdvDemand);
             }
-            patientDemand.setRdvDemands(rdvDemandList);
-            demands.add(patientDemand);
+            demands.add(PatientCycleDemand.builder()
+                                          .id(cycleId)
+                                          .rdvDemands(rdvDemandList)
+                                          .build());
             actualNumRequest += rdvDemandList.size();
             cycleId++;
         }
@@ -246,7 +247,6 @@ public class InstanceGenerator {
 
     /**
      * @param day on 1-based index
-     *
      * @return
      */
     private static boolean isWeekend(int day) {

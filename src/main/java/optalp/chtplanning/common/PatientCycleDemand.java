@@ -1,15 +1,17 @@
 package optalp.chtplanning.common;
 
-import lombok.Data;
+import lombok.Builder;
+import lombok.Value;
 
 import java.util.List;
 
-@Data
+@Value
+@Builder
 public class PatientCycleDemand {
-    private long id;
+    long id;
     /**
      * The first request should have delay equal
      * to 0.
      */
-    private List<PatientRdvDemand> rdvDemands;
+    List<PatientRdvDemand> rdvDemands;
 }

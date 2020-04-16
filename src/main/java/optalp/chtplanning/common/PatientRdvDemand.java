@@ -1,31 +1,31 @@
 package optalp.chtplanning.common;
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 /**
  * Per patient's demand
  */
-@Data
+@Value
 @Builder
 public class PatientRdvDemand {
-    private int id;
+    int id;
     /**
      * 0 means no speciality required
      */
-    private int sectorId;
+    int sectorId;
     /**
      * In days
      */
-    private int afterLastRequest;
-    private boolean needingConsultation;
-    private boolean medPreparedSameDay;
+    int afterLastRequest;
+    boolean needingConsultation;
+    boolean medPreparedSameDay;
     /**
      * In minutes
      */
-    private int medPrepDuration;
+    int medPrepDuration;
     /**
      * In minutes
      */
-    private int treatmentDuration;
+    int treatmentDuration;
 }

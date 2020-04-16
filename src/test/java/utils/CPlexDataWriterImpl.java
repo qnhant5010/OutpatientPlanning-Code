@@ -1,5 +1,6 @@
 package utils;
 
+import instance.Instance;
 import optalp.chtplanning.common.Param;
 import optalp.chtplanning.common.PatientCycleDemand;
 import optalp.chtplanning.common.PatientRdvDemand;
@@ -11,11 +12,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CPLexDataWriter extends PrintWriter {
-    public CPLexDataWriter(String fileName) throws FileNotFoundException {
+/**
+ * Writer for v1
+ */
+public class CPlexDataWriterImpl extends PrintWriter implements CPlexDataWriter {
+    public CPlexDataWriterImpl(String fileName) throws FileNotFoundException {
         super(fileName);
     }
 
+    @Override
     public void cprint(Instance instance) {
         cprint(instance.getParam());
         cprint(instance.getDemands());

@@ -5,6 +5,7 @@ import optalp.chtplanning.common.PatientCycleDemand;
 import optalp.chtplanning.common.objective.Objective;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * For each planning register, a solution should calculate the corresponding
@@ -16,19 +17,44 @@ public abstract class Solution<O extends Objective> {
     /**
      * Regroup {@link Allocation} per {@link PatientCycleDemand}'s id
      */
-    Map<Long, TreeSet<Allocation>> plannings = new HashMap<>();
+    Map<Long, Set<Allocation>> plannings = new HashMap<>();
     O objective;
 
+    /**
+     * Save the proposed allocations into planning with {@link HashSet}
+     *
+     * @param allocations
+     * @param demandId
+     */
     public void save(Collection<Allocation> allocations, Long demandId) {
-        plannings.put(demandId, new TreeSet<>(allocations));
+        save(allocations,
+             demandId,
+             HashSet::new);
     }
 
-    public Map<Long, TreeSet<Allocation>> viewPlannings() {
+    /**
+     * Save the proposed allocations into planning with defined setFactory
+     *
+     * @param allocations
+     * @param demandId
+     * @param setFactory
+     */
+    public void save(Collection<Allocation> allocations,
+                     Long demandId,
+                     Function<Collection<Allocation>, Set<Allocation>> setFactory) {
+        plannings.put(demandId,
+                      setFactory.apply(allocations));
+    }
+
+    /**
+     * @return a copy of plannings
+     */
+    public Map<Long, Set<Allocation>> viewPlannings() {
         return new HashMap<>(plannings);
     }
 
     /**
-     *
+     * Lazily evaluate objective value
      */
     public abstract void deduceObjectiveValue();
 
