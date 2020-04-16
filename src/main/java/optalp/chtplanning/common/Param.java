@@ -26,4 +26,9 @@ public class Param {
     int[][] nurses;
     Map<Long, int[][]> doctors;
     boolean[][] pharmacy;
+
+    /**
+     * Allow modifying {@link Room} on the fly
+     */
+    Set<Room> rooms;
 }

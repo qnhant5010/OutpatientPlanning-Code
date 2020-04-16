@@ -17,7 +17,7 @@ public class MinimizingMeanFlowTimeSolution extends Solution<IntegerObjective> {
                         .mapToInt(demandId -> plannings.get(demandId)
                                 .stream()
                                 .mapToInt(allocation -> allocation.sessionDay() >= 1 ?
-                                                        (allocation.sessionDay() - 1) * timeSlotsPerDay + allocation.endTreatment()
+                                                        (allocation.sessionDay() - 1) * timeSlotsPerDay + allocation.treatment().end()
                                                                                      : 0
                                          )
                                 .sum())

@@ -87,17 +87,17 @@ public class FF_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
                                  - rdvDemand.getConsultationDuration();
         // Start to find the first plausible position
         for (int startSession = 0; startSession <= latestStartSession; startSession++) {
-            allocation.startSession(startSession);
+            allocation.session().start(startSession);
             /////////////////////////////
             // Check consultation step
             // Start the consultation as soon as a suitable doctor is available
-            allocation.startConsultation(startSession);
+            allocation.consultation().start(startSession);
             if (cannotRequireDoctor(rdvDemand.getSectorId(),
                                     day,
                                     startSession,
                                     startSession + rdvDemand.getConsultationDuration()))
                 continue;
-            allocation.endConsultation(startSession + rdvDemand.getConsultationDuration());
+            allocation.consultation().end(startSession + rdvDemand.getConsultationDuration());
             //            // If no consultation, then patient should not wait until both
             //            // nurse and material is available
             //            if (!rdvDemand.isNeedingConsultation() &&
@@ -117,7 +117,7 @@ public class FF_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
                 // If prepare same day,
                 // The earliest start is after consultation
                 earliestMedPrepDay = day;
-                earliestMedPrepTime = allocation.endConsultation();
+                earliestMedPrepTime = allocation.consultation().end();
             } else {
                 // If we can prepare in advance
                 // Check from the day before
@@ -141,46 +141,46 @@ public class FF_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
             // no way this booking is possible
             if (medPrepStartTime + rdvDemand.getDrugMixingDuration() > param.getNumTimeSlots())
                 return null;
-            allocation.medPrepDay(medPrepDay);
-            allocation.startMedPrep(medPrepStartTime);
-            allocation.endMedPrep(medPrepStartTime + rdvDemand.getDrugMixingDuration());
+            allocation.drugMixingDay(medPrepDay);
+            allocation.drugMixing().start(medPrepStartTime);
+            allocation.drugMixing().end(medPrepStartTime + rdvDemand.getDrugMixingDuration());
             /////////////////////////////
             // A patient will occupy a material from start of installation to
             // end of treatment
-            allocation.startInstallation(allocation.endConsultation() - 1);
+            allocation.installation().start(allocation.consultation().end() - 1);
             do {
-                allocation.startInstallation(allocation.startInstallation() + 1);
-                allocation.endInstallation(allocation.startInstallation() + rdvDemand.getInstallationDuration());
-                if (allocation.endInstallation() > param.getNumTimeSlots())
+                allocation.installation().start(allocation.installation().start() + 1);
+                allocation.installation().end(allocation.installation().start() + rdvDemand.getInstallationDuration());
+                if (allocation.installation().end() > param.getNumTimeSlots())
                     return null;
                 // Check installation step
                 // If no nurse or material available, wait
                 if (cannotRequireNurseInstalling(day,
-                                                 allocation.startInstallation(),
-                                                 allocation.endInstallation())
+                                                 allocation.installation().start(),
+                                                 allocation.installation().end())
                     || cannotRequireMaterial(day,
-                                             allocation.startInstallation(),
-                                             allocation.endInstallation()
+                                             allocation.installation().start(),
+                                             allocation.installation().end()
                                             ))
                     continue;
                 /////////////////////////////
                 // Check treatment step
-                if (allocation.medPrepDay() == day)
-                    allocation.startTreatment(Math.max(allocation.endMedPrep(),
-                                                       allocation.endInstallation()));
+                if (allocation.drugMixingDay() == day)
+                    allocation.treatment().start(Math.max(allocation.drugMixing().end(),
+                                                       allocation.installation().end()));
                 else
-                    allocation.startTreatment(allocation.endInstallation());
+                    allocation.treatment().start(allocation.installation().end());
                 // Until a nurse is available, wait
                 while ((cannotRequireNurseTreating(day,
-                                                   allocation.startTreatment(),
-                                                   allocation.startTreatment() + rdvDemand.getTreatmentDuration())
+                                                   allocation.treatment().start(),
+                                                   allocation.treatment().start() + rdvDemand.getTreatmentDuration())
                         || cannotRequireMaterial(day,
-                                                 allocation.startTreatment(),
-                                                 allocation.startTreatment() + rdvDemand.getTreatmentDuration()))
-                       && allocation.startTreatment() + rdvDemand.getTreatmentDuration() <= param.getNumTimeSlots())
-                    allocation.startTreatment(allocation.startTreatment() + 1);
-                allocation.endTreatment(allocation.startTreatment() + rdvDemand.getTreatmentDuration());
-                if (allocation.endTreatment() > param.getNumTimeSlots())
+                                                 allocation.treatment().start(),
+                                                 allocation.treatment().start() + rdvDemand.getTreatmentDuration()))
+                       && allocation.treatment().start() + rdvDemand.getTreatmentDuration() <= param.getNumTimeSlots())
+                    allocation.treatment().start(allocation.treatment().start() + 1);
+                allocation.treatment().end(allocation.treatment().start() + rdvDemand.getTreatmentDuration());
+                if (allocation.treatment().end() > param.getNumTimeSlots())
                     // No way the next tries will yield a good solution
                     // Because the next starting points will not lead to any resource availability sooner
                     return null;
@@ -188,17 +188,17 @@ public class FF_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
                     // Must verify availabilities of material on whole process
                     // If a place is ready for whole process time, return this value
                     if (!cannotRequireMaterial(day,
-                                               allocation.startInstallation(),
-                                               allocation.endTreatment()))
+                                               allocation.installation().start(),
+                                               allocation.treatment().end()))
                         break;
                 }
-            } while (allocation.endTreatment() <= param.getNumTimeSlots());
-            if (allocation.endTreatment() > param.getNumTimeSlots())
+            } while (allocation.treatment().end() <= param.getNumTimeSlots());
+            if (allocation.treatment().end() > param.getNumTimeSlots())
                 return null;
             /////////////////////////////
             // Finalize
-            allocation.endSession(allocation.endTreatment());
-            if (allocation.endSession() > param.getNumTimeSlots())
+            allocation.session().end(allocation.treatment().end());
+            if (allocation.session().end() > param.getNumTimeSlots())
                 return null;
             else
                 return allocation;

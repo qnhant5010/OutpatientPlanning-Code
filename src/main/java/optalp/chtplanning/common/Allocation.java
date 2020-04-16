@@ -17,17 +17,12 @@ public class Allocation implements Comparable<Allocation> {
     private long id;
     private long sectorId;
     private int sessionDay;
-    private int startSession;
-    private int endSession;
-    private int startConsultation;
-    private int endConsultation;
-    private int startInstallation;
-    private int endInstallation;
-    private int medPrepDay;
-    private int startMedPrep;
-    private int endMedPrep;
-    private int startTreatment;
-    private int endTreatment;
+    private Interval session;
+    private Interval consultation;
+    private Interval installation;
+    private int drugMixingDay;
+    private Interval drugMixing;
+    private Interval treatment;
 
     @Override
     public int compareTo(Allocation o) {

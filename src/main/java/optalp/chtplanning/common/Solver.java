@@ -166,26 +166,26 @@ public abstract class Solver<S extends Solution<?>> {
             // Doctor
             registerWorkload(doctorWorkload.get(allocation.sectorId()),
                              allocation.sessionDay(),
-                             allocation.startConsultation(),
-                             allocation.endConsultation()
+                             allocation.consultation().start(),
+                             allocation.consultation().end()
                             );
             // Nurse on installation
             registerWorkload(nurseWorkload,
                              allocation.sessionDay(),
-                             allocation.startInstallation(),
-                             allocation.endInstallation(),
+                             allocation.installation().start(),
+                             allocation.installation().end(),
                              1);
             // Material
             registerWorkload(materialWorkload,
                              allocation.sessionDay(),
-                             allocation.startInstallation(),
-                             allocation.endTreatment()
+                             allocation.installation().start(),
+                             allocation.treatment().end()
                             );
             // Nurse on treatment
             registerWorkload(nurseWorkload,
                              allocation.sessionDay(),
-                             allocation.startTreatment(),
-                             allocation.endTreatment(),
+                             allocation.treatment().start(),
+                             allocation.treatment().end(),
                              (float) 1 / param.getMultitasks());
         });
     }

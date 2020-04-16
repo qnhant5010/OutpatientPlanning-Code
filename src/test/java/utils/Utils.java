@@ -49,21 +49,21 @@ public class Utils {
                         "Rdv %d : A %d %d --> %d %d  B %d %d --> %d %d  C %d %d --> %d %d  D %d %d --> %d %d",
                         allocation.id(),
                         allocation.sessionDay(),
-                        allocation.startConsultation() + 1,
+                        allocation.consultation().start() + 1,
                         allocation.sessionDay(),
-                        allocation.endConsultation() + 1,
+                        allocation.consultation().end() + 1,
                         allocation.sessionDay(),
-                        allocation.startInstallation() + 1,
+                        allocation.installation().start() + 1,
                         allocation.sessionDay(),
-                        allocation.endInstallation() + 1,
-                        allocation.medPrepDay(),
-                        allocation.startMedPrep() + 1,
-                        allocation.medPrepDay(),
-                        allocation.endMedPrep() + 1,
+                        allocation.installation().end() + 1,
+                        allocation.drugMixingDay(),
+                        allocation.drugMixing().start() + 1,
+                        allocation.drugMixingDay(),
+                        allocation.drugMixing().end() + 1,
                         allocation.sessionDay(),
-                        allocation.startTreatment() + 1,
+                        allocation.treatment().start() + 1,
                         allocation.sessionDay(),
-                        allocation.endTreatment() + 1)));
+                        allocation.treatment().end() + 1)));
             });
         }
     }
