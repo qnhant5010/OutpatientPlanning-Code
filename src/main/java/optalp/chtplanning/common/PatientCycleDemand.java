@@ -3,6 +3,7 @@ package optalp.chtplanning.common;
 import lombok.Builder;
 import lombok.Value;
 
+import java.util.Collections;
 import java.util.List;
 
 @Value
@@ -10,8 +11,12 @@ import java.util.List;
 public class PatientCycleDemand {
     long id;
     /**
-     * The first request should have delay equal
-     * to 0.
+     * Unmodifiable
      */
     List<PatientRdvDemand> rdvDemands;
+
+    public PatientCycleDemand(long id, List<PatientRdvDemand> rdvDemands) {
+        this.id = id;
+        this.rdvDemands = Collections.unmodifiableList(rdvDemands);
+    }
 }
