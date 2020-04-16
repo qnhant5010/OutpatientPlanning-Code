@@ -3,14 +3,13 @@ package optalp.chtplanning.common;
 import lombok.NonNull;
 import lombok.Value;
 
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Set;
 
 @Value
 public class Room {
     /**
-     * Id of materials. Unmodifiable
+     * Id of materials
      */
     @NonNull
     Set<Long> materials;
@@ -18,7 +17,7 @@ public class Room {
     public Room(@NonNull Set<Long> materials) {
         if (materials.isEmpty())
             throw new IllegalArgumentException("Room must not be empty");
-        this.materials = Collections.unmodifiableSet(materials);
+        this.materials = materials;
     }
 
     @Override

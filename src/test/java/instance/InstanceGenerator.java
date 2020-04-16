@@ -3,9 +3,7 @@ package instance;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import config.GeneralConfig;
-import optalp.chtplanning.common.Param;
-import optalp.chtplanning.common.PatientCycleDemand;
-import optalp.chtplanning.common.PatientRdvDemand;
+import optalp.chtplanning.common.*;
 import utils.CPlexDataWriter;
 import utils.CPlexDataWriterImpl;
 import utils.Utils;
@@ -15,9 +13,6 @@ import java.io.Writer;
 import java.util.*;
 import java.util.function.Supplier;
 
-/**
- * v1 instance generator
- */
 public class InstanceGenerator {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -36,9 +31,11 @@ public class InstanceGenerator {
                 for (int testIndex = 1; testIndex <= GeneralConfig.NUMBER_OF_TESTS; testIndex++) {
                     Supplier<Param> paramSupplier = SCENARIO_GENERATORS.get(scenario);
                     assert paramSupplier != null;
+                    List<PatientCycleDemand> demands = generateDemands(problemSize);
                     Instance instance = new Instance(
                             paramSupplier.get(),
-                            generateDemands(problemSize)
+                            demands,
+                            generateIncompatibilities(demands)
                     );
                     // json
                     try (Writer writer = new FileWriter(GeneralConfig.getJsonInstanceFile(problemSize, scenario, testIndex))) {
@@ -53,55 +50,99 @@ public class InstanceGenerator {
         }
     }
 
-    private static List<PatientCycleDemand> generateDemands(int numRdv) {
+    private static Set<Incompatibility> generateIncompatibilities(List<PatientCycleDemand> demands) {
+        Set<Incompatibility> incompatibilities = new HashSet<>();
+        // Gender incompatibility
+        Set<Long> males = new HashSet<>();
+        Set<Long> females = new HashSet<>();
+        demands.forEach(patientCycleDemand -> {
+            if (GeneralConfig.isMale()) {
+                males.add(patientCycleDemand.getId());
+            } else {
+                females.add(patientCycleDemand.getId());
+            }
+        });
+        males.forEach(male -> females.forEach(female -> incompatibilities.add(new Incompatibility(male, female))));
+        // Infectious
+        Set<Long> infectious = new HashSet<>();
+        demands.forEach(patientCycleDemand -> {
+            if (GeneralConfig.isInfectious())
+                infectious.add(patientCycleDemand.getId());
+        });
+        infectious.forEach(i -> demands.forEach(d -> {
+            if (!Objects.equals(d.getId(), i))
+                incompatibilities.add(new Incompatibility(i, d.getId()));
+        }));
+        return incompatibilities;
+    }
+
+    private static List<PatientCycleDemand> generateDemands(int requiredNumRdv) {
         List<PatientCycleDemand> demands = new ArrayList<>();
-        int actualNumRequest = 0;
+        int currentNumRdvRequest = 0;
         long cycleId = 0;
-        while (actualNumRequest < numRdv) {
-            int size = GeneralConfig.randomPick(GeneralConfig.CYCLE_DEMANDS_PER_PATIENT);
-            if (actualNumRequest + size > numRdv)
-                size = numRdv - actualNumRequest;
+        while (currentNumRdvRequest < requiredNumRdv) {
+            int size = GeneralConfig.randomPick(GeneralConfig.RDV_DEMANDS_PER_PATIENT);
+            if (currentNumRdvRequest + size > requiredNumRdv)
+                size = requiredNumRdv - currentNumRdvRequest;
             assert size != 0;
             // same protocol
-            int treatmentDuration = GeneralConfig.randomPick(GeneralConfig.TREATMENT_DURATIONS);
-            int medPrepDuration = GeneralConfig.randomPick(GeneralConfig.MED_PREP_DURATIONS);
             int sectorId = GeneralConfig.randomPick(GeneralConfig.SECTORS);
             // Random requests
             List<PatientRdvDemand> rdvDemandList = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
-                PatientRdvDemand rdvDemand = PatientRdvDemand.builder()
-                                                             .id(i)
-                                                             .treatmentDuration(treatmentDuration)
-                                                             .drugMixingDuration(medPrepDuration)
-                                                             .drugMixingSameDay(GeneralConfig.randomTrueFalse())
-                                                             .afterLastRequest(i == 0 ? 0 : GeneralConfig.randomPick(GeneralConfig.RDV_DELAYS))
-                                                             .consultationDuration(GeneralConfig.randomTrueFalse()
-                                                                                   ? CONSULTATION_LENGTH
-                                                                                   : 0)
-                                                             .installationDuration(INSTALLATION_LENGTH)
-                                                             .sectorId(sectorId)
-                                                             .build();
-                rdvDemandList.add(rdvDemand);
+                rdvDemandList.add(PatientRdvDemand.builder()
+                                                  .id(i)
+                                                  .treatmentDuration(GeneralConfig.randomPick(GeneralConfig.TREATMENT_DURATIONS))
+                                                  .drugMixingDuration(GeneralConfig.randomPick(GeneralConfig.DRUG_MIXING_DURATIONS))
+                                                  .drugMixingSameDay(GeneralConfig.randomTrueFalse())
+                                                  .afterLastRequest(i == 0 ? 0 : GeneralConfig.randomPick(GeneralConfig.RDV_DELAYS))
+                                                  .consultationDuration(sectorId == 0
+                                                                        ? 0
+                                                                        : GeneralConfig.randomTrueFalse()
+                                                                          ? CONSULTATION_LENGTH
+                                                                          : 0)
+                                                  .installationDuration(INSTALLATION_LENGTH)
+                                                  .sectorId(sectorId)
+                                                  .build());
             }
             demands.add(PatientCycleDemand.builder()
                                           .id(cycleId)
                                           .rdvDemands(rdvDemandList)
                                           .build());
-            actualNumRequest += rdvDemandList.size();
+            currentNumRdvRequest += rdvDemandList.size();
             cycleId++;
         }
         return demands;
     }
 
+    private static Set<Room> generateRooms() {
+        Set<Room> rooms = new HashSet<>();
+        int assignedMaterialsCounter = 0;
+        while (assignedMaterialsCounter < GeneralConfig.MATERIALS) {
+            int numMaterialsToAssign = GeneralConfig.getNumMaterialsToAssignToARoom();
+            if (assignedMaterialsCounter + numMaterialsToAssign > GeneralConfig.MATERIALS)
+                numMaterialsToAssign = assignedMaterialsCounter + numMaterialsToAssign - GeneralConfig.MATERIALS;
+            Set<Long> materials = new HashSet<>();
+            for (int i = assignedMaterialsCounter; i < assignedMaterialsCounter + numMaterialsToAssign; i++) {
+                materials.add((long) i);
+            }
+            assignedMaterialsCounter += numMaterialsToAssign;
+            rooms.add(new Room(materials));
+        }
+        return rooms;
+    }
+
     private static Param generateUniformParam() {
         final Map<Long, int[][]> doctors = new HashMap<>();
-        final int[][] doctorsSector0 = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
-        for (int i = 1; i <= GeneralConfig.HORIZON_LENGTH; i++) {
-            for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
-                doctorsSector0[i][j] = GeneralConfig.randomPick(GeneralConfig.MAX_DOCTOR + 1);
+        for (int sector : GeneralConfig.SECTORS) {
+            final int[][] doctorsSector = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
+            for (int i = 1; i <= GeneralConfig.HORIZON_LENGTH; i++) {
+                for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
+                    doctorsSector[i][j] = GeneralConfig.randomPick(GeneralConfig.MAX_DOCTOR + 1);
+                }
             }
+            doctors.put((long) sector, doctorsSector);
         }
-        doctors.put(0L, doctorsSector0);
         final int[][] nurses = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 1; i <= GeneralConfig.HORIZON_LENGTH; i++) {
             for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
@@ -123,6 +164,7 @@ public class InstanceGenerator {
                     .doctors(doctors)
                     .nurses(nurses)
                     .pharmacy(pharmacy)
+                    .rooms(generateRooms())
                     .build();
     }
 

@@ -37,14 +37,15 @@ public class GeneralConfig {
     public static final int HORIZON_LENGTH = 28;
     public static final int MULTITASK = 6;
     public static final int MAX_DOCTOR = 5;
-    public static final int MAX_NURSES = 6;
+    public static final int MAX_NURSES = 5;
     public static final int MATERIALS = 30;
     private static final boolean[] BOOLEANS = {true, false};
-    public static final int[] CYCLE_DEMANDS_PER_PATIENT = new int[]{1, 2, 3};
-    public static final int[] RDV_DELAYS = new int[]{1, 2, 3};
-    public static final int[] TREATMENT_DURATIONS = new int[]{0, 1, 2, 3};
-    public static final int[] MED_PREP_DURATIONS = new int[]{0, 1, 2, 3};
-    public static final int[] SECTORS = new int[]{0};
+    public static final int[] RDV_DEMANDS_PER_PATIENT = new int[]{1, 2, 3};
+    public static final int[] RDV_DELAYS = new int[]{1, 2, 3, 7};
+    public static final int[] TREATMENT_DURATIONS = new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    public static final int[] DRUG_MIXING_DURATIONS = new int[]{0, 1, 2, 3, 4, 5, 6};
+    public static final int[] SECTORS = new int[]{0, 1, 2, 3};
+    public static final int[] MATERIALS_PER_ROOM = new int[]{1, 2};
 
     private static final Random RANDOMIZE = new Random();
 
@@ -58,6 +59,16 @@ public class GeneralConfig {
 
     public static boolean randomTrueFalse() {
         return BOOLEANS[RANDOMIZE.nextInt(2)];
+    }
+
+    public static boolean isMale() {
+        return randomTrueFalse();
+    }
+
+    public static final double INFECTIOUS_RATE = 0.1D;
+
+    public static boolean isInfectious() {
+        return RANDOMIZE.nextDouble() < INFECTIOUS_RATE;
     }
 
     public static String getJsonInstanceFile(int problemSize, String scenario, int testIndex) {
@@ -76,5 +87,9 @@ public class GeneralConfig {
 
     public static String getInstanceName(int problemSize, String scenario, int testIndex) {
         return problemSize + "_" + scenario + "_" + testIndex;
+    }
+
+    public static int getNumMaterialsToAssignToARoom() {
+        return randomPick(MATERIALS_PER_ROOM);
     }
 }
