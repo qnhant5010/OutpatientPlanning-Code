@@ -13,7 +13,8 @@ public class PatientRdvDemand {
     /**
      * 0 means no speciality required
      */
-    int sectorId;
+    @NonNull
+    Long sectorId;
     /**
      * In days
      */

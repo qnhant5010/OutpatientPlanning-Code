@@ -86,7 +86,7 @@ public class InstanceGenerator {
                 size = requiredNumRdv - currentNumRdvRequest;
             assert size != 0;
             // same protocol
-            int sectorId = GeneralConfig.randomPick(GeneralConfig.SECTORS);
+            Long sectorId = GeneralConfig.randomPick(GeneralConfig.SECTORS);
             // Random requests
             List<PatientRdvDemand> rdvDemandList = new ArrayList<>(size);
             for (int i = 0; i < size; i++) {
@@ -134,14 +134,15 @@ public class InstanceGenerator {
 
     private static Param generateUniformParam() {
         final Map<Long, int[][]> doctors = new HashMap<>();
-        for (int sector : GeneralConfig.SECTORS) {
+        for (Long sector : GeneralConfig.SECTORS) {
+            if (sector == 0L) continue;
             final int[][] doctorsSector = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
             for (int i = 1; i <= GeneralConfig.HORIZON_LENGTH; i++) {
                 for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
                     doctorsSector[i][j] = GeneralConfig.randomPick(GeneralConfig.MAX_DOCTOR + 1);
                 }
             }
-            doctors.put((long) sector, doctorsSector);
+            doctors.put(sector, doctorsSector);
         }
         final int[][] nurses = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 1; i <= GeneralConfig.HORIZON_LENGTH; i++) {
@@ -160,7 +161,7 @@ public class InstanceGenerator {
                     .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
                     .multitasks(GeneralConfig.MULTITASK)
                     .numMaterials(GeneralConfig.MATERIALS)
-                    .sectorIds(Collections.singleton(0L))
+                    .sectorIds(new HashSet<>(GeneralConfig.SECTORS))
                     .doctors(doctors)
                     .nurses(nurses)
                     .pharmacy(pharmacy)
@@ -170,14 +171,17 @@ public class InstanceGenerator {
 
     private static Param generateDailyParam() {
         final Map<Long, int[][]> doctors = new HashMap<>();
-        final int[][] doctorsSector0 = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
-        for (int i = 0; i < GeneralConfig.TIME_SLOTS_PER_DAY; i++) {
-            final int numDoctor = GeneralConfig.randomPick(GeneralConfig.MAX_DOCTOR + 1);
-            for (int j = 1; j <= GeneralConfig.HORIZON_LENGTH; j++) {
-                doctorsSector0[j][i] = numDoctor;
+        for (Long sector : GeneralConfig.SECTORS) {
+            if (sector == 0L) continue;
+            final int[][] doctorsSector = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
+            for (int i = 0; i < GeneralConfig.TIME_SLOTS_PER_DAY; i++) {
+                final int numDoctor = GeneralConfig.randomPick(GeneralConfig.MAX_DOCTOR + 1);
+                for (int j = 1; j <= GeneralConfig.HORIZON_LENGTH; j++) {
+                    doctorsSector[j][i] = numDoctor;
+                }
             }
+            doctors.put(sector, doctorsSector);
         }
-        doctors.put(0L, doctorsSector0);
         final int[][] nurses = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i < GeneralConfig.TIME_SLOTS_PER_DAY; i++) {
             final int numNurses = GeneralConfig.randomPick(GeneralConfig.MAX_NURSES + 1);
@@ -197,25 +201,29 @@ public class InstanceGenerator {
                     .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
                     .multitasks(GeneralConfig.MULTITASK)
                     .numMaterials(GeneralConfig.MATERIALS)
-                    .sectorIds(Collections.singleton(0L))
+                    .sectorIds(new HashSet<>(GeneralConfig.SECTORS))
                     .doctors(doctors)
                     .nurses(nurses)
                     .pharmacy(pharmacy)
+                    .rooms(generateRooms())
                     .build();
     }
 
     private static Param generateWeeklyParam() {
         final Map<Long, int[][]> doctors = new HashMap<>();
-        final int[][] doctorsSector0 = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
-        for (int i = 0; i < Math.min(7, GeneralConfig.HORIZON_LENGTH); i++) {
-            for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
-                doctorsSector0[i][j] = GeneralConfig.randomPick(GeneralConfig.MAX_DOCTOR + 1);
+        for (Long sector : GeneralConfig.SECTORS) {
+            if (sector == 0L) continue;
+            final int[][] doctorsSector = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
+            for (int i = 0; i < Math.min(7, GeneralConfig.HORIZON_LENGTH); i++) {
+                for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
+                    doctorsSector[i][j] = GeneralConfig.randomPick(GeneralConfig.MAX_DOCTOR + 1);
+                }
             }
+            for (int i = 7; i < Math.max(7, GeneralConfig.HORIZON_LENGTH); i++) {
+                System.arraycopy(doctorsSector[i % 7], 0, doctorsSector[i], 0, GeneralConfig.TIME_SLOTS_PER_DAY);
+            }
+            doctors.put(sector, doctorsSector);
         }
-        for (int i = 7; i < Math.max(7, GeneralConfig.HORIZON_LENGTH); i++) {
-            System.arraycopy(doctorsSector0[i % 7], 0, doctorsSector0[i], 0, GeneralConfig.TIME_SLOTS_PER_DAY);
-        }
-        doctors.put(0L, doctorsSector0);
         final int[][] nurses = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i < Math.min(7, GeneralConfig.HORIZON_LENGTH); i++) {
             for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
@@ -239,24 +247,28 @@ public class InstanceGenerator {
                     .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
                     .multitasks(GeneralConfig.MULTITASK)
                     .numMaterials(GeneralConfig.MATERIALS)
-                    .sectorIds(Collections.singleton(0L))
+                    .sectorIds(new HashSet<>(GeneralConfig.SECTORS))
                     .doctors(doctors)
                     .nurses(nurses)
                     .pharmacy(pharmacy)
+                    .rooms(generateRooms())
                     .build();
     }
 
     private static Param generateWeekendParam() {
         int today = GeneralConfig.randomPick(7);
         final Map<Long, int[][]> doctors = new HashMap<>();
-        final int[][] doctorsSector0 = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
-        for (int i = 0; i <= GeneralConfig.HORIZON_LENGTH; i++) {
-            if (isWeekend(i + today)) continue;
-            for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
-                doctorsSector0[i][j] = GeneralConfig.randomPick(GeneralConfig.MAX_DOCTOR + 1);
+        for (Long sector : GeneralConfig.SECTORS) {
+            if (sector == 0L) continue;
+            final int[][] doctorsSector = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
+            for (int i = 0; i <= GeneralConfig.HORIZON_LENGTH; i++) {
+                if (isWeekend(i + today)) continue;
+                for (int j = 0; j < GeneralConfig.TIME_SLOTS_PER_DAY; j++) {
+                    doctorsSector[i][j] = GeneralConfig.randomPick(GeneralConfig.MAX_DOCTOR + 1);
+                }
             }
+            doctors.put(sector, doctorsSector);
         }
-        doctors.put(0L, doctorsSector0);
         final int[][] nurses = new int[GeneralConfig.HORIZON_LENGTH + 1][GeneralConfig.TIME_SLOTS_PER_DAY + 1];
         for (int i = 0; i <= GeneralConfig.HORIZON_LENGTH; i++) {
             if (isWeekend(i + today)) continue;
@@ -276,10 +288,11 @@ public class InstanceGenerator {
                     .numTimeSlots(GeneralConfig.TIME_SLOTS_PER_DAY)
                     .multitasks(GeneralConfig.MULTITASK)
                     .numMaterials(GeneralConfig.MATERIALS)
-                    .sectorIds(Collections.singleton(0L))
+                    .sectorIds(new HashSet<>(GeneralConfig.SECTORS))
                     .doctors(doctors)
                     .nurses(nurses)
                     .pharmacy(pharmacy)
+                    .rooms(generateRooms())
                     .build();
     }
 

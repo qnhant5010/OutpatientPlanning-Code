@@ -1,5 +1,6 @@
 package optalp.chtplanning.common;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
 
@@ -9,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Data
+@AllArgsConstructor
 public class Incompatibility {
     @NonNull
     private Set<Long> patients;
