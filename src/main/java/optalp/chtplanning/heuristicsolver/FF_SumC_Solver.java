@@ -74,20 +74,22 @@ public class FF_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
      * @return
      */
     protected Allocation tryBooking(PatientRdvDemand rdvDemand, int day) {
-        Allocation allocation = Allocation.builder()
-                                          .sessionDay(day)
-                                          .sectorId(rdvDemand.getSectorId())
-                                          .build();
+        Allocation allocation = new Allocation();
+        allocation.sessionDay(day);
+        allocation.sectorId(rdvDemand.getSectorId());
         // Define the last time slot we can start
         int latestStartSession = param.getNumTimeSlots()
                                  - rdvDemand.getTreatmentDuration()
-                                 - (Math.max((rdvDemand.isDrugMixingSameDay() ? rdvDemand.getDrugMixingDuration() : 0),
+                                 - (Math.max((rdvDemand.isDrugMixingSameDay()
+                                              ? rdvDemand.getDrugMixingDuration()
+                                              : 0),
                                              rdvDemand.getInstallationDuration()
                                             ))
                                  - rdvDemand.getConsultationDuration();
         // Start to find the first plausible position
         for (int startSession = 0; startSession <= latestStartSession; startSession++) {
-            allocation.session().start(startSession);
+            allocation.session()
+                      .start(startSession);
             /////////////////////////////
             // Check consultation step
             // Start the consultation as soon as a suitable doctor is available
@@ -167,7 +169,7 @@ public class FF_SumC_Solver extends Solver<MinimizingMeanFlowTimeSolution> {
                 // Check treatment step
                 if (allocation.drugMixingDay() == day)
                     allocation.treatment().start(Math.max(allocation.drugMixing().end(),
-                                                       allocation.installation().end()));
+                                                          allocation.installation().end()));
                 else
                     allocation.treatment().start(allocation.installation().end());
                 // Until a nurse is available, wait

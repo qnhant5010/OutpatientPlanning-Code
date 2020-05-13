@@ -1,6 +1,5 @@
 package optalp.chtplanning.common;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -9,7 +8,6 @@ import lombok.experimental.Accessors;
  */
 @Data
 @Accessors(fluent = true)
-@Builder
 public class Allocation implements Comparable<Allocation> {
     /**
      * Per patient
@@ -17,12 +15,12 @@ public class Allocation implements Comparable<Allocation> {
     private long id;
     private long sectorId;
     private int sessionDay;
-    private Interval session;
-    private Interval consultation;
-    private Interval installation;
+    private Interval session = new Interval();
+    private Interval consultation = new Interval();
+    private Interval installation = new Interval();
     private int drugMixingDay;
-    private Interval drugMixing;
-    private Interval treatment;
+    private Interval drugMixing = new Interval();
+    private Interval treatment = new Interval();
 
     @Override
     public int compareTo(Allocation o) {
