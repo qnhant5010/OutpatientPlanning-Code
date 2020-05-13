@@ -1,12 +1,7 @@
 package optalp.chtplanning.simplegasolver;
 
-import io.jenetics.Alterer;
-import io.jenetics.EnumGene;
-import io.jenetics.Optimize;
-import io.jenetics.engine.Codec;
-import io.jenetics.engine.Codecs;
-import io.jenetics.engine.Engine;
-import io.jenetics.engine.EvolutionResult;
+import io.jenetics.*;
+import io.jenetics.engine.*;
 import io.jenetics.util.ISeq;
 import optalp.chtplanning.common.Allocation;
 import optalp.chtplanning.common.Param;
@@ -17,20 +12,30 @@ import optalp.chtplanning.heuristicsolver.FF_SumC_Solver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 public class CustomizableGASolver extends GASolver {
-    private int populationSize;
-    private int maxGen;
-    private Alterer<EnumGene<PatientCycleDemand>, Integer> alterer;
-    private List<Integer> bestObjectives;
+    private final int populationSize;
+    private final int maxGen;
+    private final Alterer<EnumGene<PatientCycleDemand>, Integer> alterer;
+    private final List<Integer> bestObjectives;
+    private final Executor executor;
+    private final double offspringFraction;
+    private final Selector<EnumGene<PatientCycleDemand>, Integer> selector;
 
     public CustomizableGASolver(int populationSize,
                                 int maxGen,
-                                Alterer<EnumGene<PatientCycleDemand>, Integer> alterer) {
+                                Alterer<EnumGene<PatientCycleDemand>, Integer> alterer,
+                                Executor executor,
+                                double offspringFraction,
+                                Selector<EnumGene<PatientCycleDemand>, Integer> selector) {
         this.populationSize = populationSize;
         this.maxGen = maxGen;
         this.bestObjectives = new ArrayList<>(maxGen);
         this.alterer = alterer;
+        this.executor = executor;
+        this.offspringFraction = offspringFraction;
+        this.selector = selector;
     }
 
     @Override
@@ -43,15 +48,19 @@ public class CustomizableGASolver extends GASolver {
                 = Codecs.ofPermutation(ISeq.of(cycleDemands));
         Engine<EnumGene<PatientCycleDemand>, Integer> engine = Engine
                 .builder(this::eval, CODEC)
+                .offspringFraction(offspringFraction)
                 .optimize(Optimize.MINIMUM)
                 .populationSize(populationSize)
                 .alterers(alterer)
+                .maximalPhenotypeAge(Integer.MAX_VALUE)
+                .executor(executor)
+                .selector(selector)
                 .build();
         List<PatientCycleDemand> bestChromosome;
         bestChromosome = CODEC.decode(
                 engine.stream()
                         .limit(maxGen)
-                        .peek(evolutionResult -> bestObjectives.add(evolutionResult.getBestFitness()))
+                        .peek(evolutionResult -> bestObjectives.add(evolutionResult.bestFitness()))
                         .collect(EvolutionResult.toBestGenotype()))
                 .asList();
         // Compile to solution

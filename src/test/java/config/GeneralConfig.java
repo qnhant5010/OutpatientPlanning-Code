@@ -39,7 +39,7 @@ public class GeneralConfig {
             15,
             30,
             60,
-//            90,
+            90,
 //            120,
 //            150,
 //            180,
