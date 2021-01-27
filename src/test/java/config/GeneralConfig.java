@@ -34,16 +34,16 @@ public class GeneralConfig {
             "weekly",
             "weekend",
             };
-    public static final int NUMBER_OF_TESTS = 30;
+    public static final int NUMBER_OF_TESTS = 10;
     public static final int[] PROBLEM_SIZES = new int[]{
             15,
             30,
             60,
             90,
-//            120,
-//            150,
-//            180,
-//            210
+            120,
+            150,
+            180,
+            210
     };
     public static final int TIME_SLOTS_PER_DAY = 22;
     public static final int HORIZON_LENGTH = 28;
