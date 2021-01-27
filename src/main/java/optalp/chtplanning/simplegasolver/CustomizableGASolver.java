@@ -59,7 +59,7 @@ public class CustomizableGASolver extends GASolver {
         List<PatientCycleDemand> bestChromosome;
         bestChromosome = CODEC.decode(
                 engine.stream()
-                        .limit(maxGen)
+                      .limit(Limits.bySteadyFitness(maxGen))
                         .peek(evolutionResult -> bestObjectives.add(evolutionResult.bestFitness()))
                         .collect(EvolutionResult.toBestGenotype()))
                 .asList();
