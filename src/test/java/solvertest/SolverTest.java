@@ -3,13 +3,15 @@ package solvertest;
 import com.google.gson.stream.JsonReader;
 import config.GeneralConfig;
 import instance.Instance;
+import io.jenetics.*;
 import optalp.chtplanning.common.Param;
 import optalp.chtplanning.common.PatientCycleDemand;
 import optalp.chtplanning.common.Solver;
 import optalp.chtplanning.common.SolverException;
 import optalp.chtplanning.common.objective.IntegerObjective;
 import optalp.chtplanning.common.solution.Solution;
-import optalp.chtplanning.heuristicsolver.*;
+import optalp.chtplanning.heuristicsolver.CIPT_FF_SumC_Solver;
+import optalp.chtplanning.simplegasolver.CustomizableGASolver;
 import optalp.chtplanning.simplegasolver.SimpleGASolver;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -38,6 +40,7 @@ class SolverTest {
     public static final int[] POP_SIZES = new int[]{40, 80};
     public static final int[] GEN_COUNTS = new int[]{25, 50};
     private static final Map<Integer, Executor> executorMap = new HashMap<>();
+    private static CustomizableGASolver bestGASolver;
 
     @BeforeAll
     static void init() throws IOException {
@@ -49,6 +52,14 @@ class SolverTest {
                             threadCount == 0 ? Executors.newSingleThreadExecutor()
                                              : Executors.newFixedThreadPool(threadCount));
         }
+        bestGASolver = new CustomizableGASolver(1000,
+                                                100,
+                                                new PartiallyMatchedCrossover<PatientCycleDemand, Integer>(1.0)
+                                                        .andThen(new SwapMutator<>(0.1)),
+                                                Executors.newSingleThreadExecutor(),
+                                                0.5,
+                                                new TournamentSelector<>(3)
+        );
     }
 
     private static Stream<Arguments> getGeneratedDataset() {
@@ -152,6 +163,17 @@ class SolverTest {
     void runSimpleGASolver(int problemSize, String scenario, int testIndex) throws IOException {
         runEachTest("GA-40-25",
                     new SimpleGASolver(40, 25, Executors.newWorkStealingPool()),
+                    problemSize,
+                    scenario,
+                    testIndex,
+                    true);
+    }
+
+    @ParameterizedTest(name = "Best GA - {index}: {0} {1} {2}")
+    @MethodSource("getGeneratedDataset")
+    void runBestGASolver(int problemSize, String scenario, int testIndex) throws IOException {
+        runEachTest("GA_best",
+                    bestGASolver,
                     problemSize,
                     scenario,
                     testIndex,
