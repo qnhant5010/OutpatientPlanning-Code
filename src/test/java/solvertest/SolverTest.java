@@ -47,11 +47,11 @@ class SolverTest {
         Utils.createDir();
         CSV_WRITER =
                 new RecordCSVWriter(GeneralConfig.SYNTHESIS_CSV_GETTER.get());
-        for (int threadCount = 0; threadCount < Runtime.getRuntime().availableProcessors(); threadCount = threadCount + 2) {
-            executorMap.put(threadCount,
-                            threadCount == 0 ? Executors.newSingleThreadExecutor()
-                                             : Executors.newFixedThreadPool(threadCount));
-        }
+//        for (int threadCount = 0; threadCount < Runtime.getRuntime().availableProcessors(); threadCount = threadCount + 2) {
+//            executorMap.put(threadCount,
+//                            threadCount == 0 ? Executors.newSingleThreadExecutor()
+//                                             : Executors.newFixedThreadPool(threadCount));
+//        }
         bestGASolver = new CustomizableGASolver(1000,
                                                 100,
                                                 new PartiallyMatchedCrossover<PatientCycleDemand, Integer>(1.0)
