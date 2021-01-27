@@ -177,7 +177,7 @@ class SolverTest {
                     problemSize,
                     scenario,
                     testIndex,
-                    true);
+                    false);
     }
 
     @ParameterizedTest(name = "GA - {index}: {1} {0} {2} p{3} g{4} t{5} r{6}")
