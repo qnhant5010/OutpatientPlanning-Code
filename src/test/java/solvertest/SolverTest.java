@@ -3,11 +3,10 @@ package solvertest;
 import com.google.gson.stream.JsonReader;
 import config.GeneralConfig;
 import instance.Instance;
-import io.jenetics.*;
-import optalp.chtplanning.common.Param;
-import optalp.chtplanning.common.PatientCycleDemand;
-import optalp.chtplanning.common.Solver;
-import optalp.chtplanning.common.SolverException;
+import io.jenetics.PartiallyMatchedCrossover;
+import io.jenetics.SwapMutator;
+import io.jenetics.TournamentSelector;
+import optalp.chtplanning.common.*;
 import optalp.chtplanning.common.objective.IntegerObjective;
 import optalp.chtplanning.common.solution.Solution;
 import optalp.chtplanning.heuristicsolver.CIPT_FF_SumC_Solver;
@@ -236,8 +235,14 @@ class SolverTest {
                                                         GeneralConfig.getJsonInstanceFile(problemSize, scenario, testIndex)
                                                 )),
                                                 Instance.class);
-        List<PatientCycleDemand> cycleDemands = instance.getDemands();
         Param param = instance.getParam();
+        List<PatientCycleDemand> cycleDemands = instance.getDemands();
+        for (PatientCycleDemand cycleDemand : cycleDemands) {
+            for (PatientRdvDemand patientRdvDemand : cycleDemand.getRdvDemands()) {
+                patientRdvDemand.setConsultationDuration(patientRdvDemand.getNeedingConsultation() ? 1 : 0);
+                patientRdvDemand.setInstallationDuration(1);
+            }
+        }
         Solution<?> solution = null;
         SolverException exception = null;
         Record record;

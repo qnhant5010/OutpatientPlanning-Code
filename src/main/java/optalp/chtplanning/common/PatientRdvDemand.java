@@ -1,11 +1,14 @@
 package optalp.chtplanning.common;
 
-import lombok.*;
+import com.google.gson.annotations.SerializedName;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NonNull;
 
 /**
  * Per patient's demand
  */
-@Value
+@Data
 @Builder
 public class PatientRdvDemand {
     @NonNull
@@ -20,27 +23,18 @@ public class PatientRdvDemand {
      */
     @NonNull
     Integer afterLastRequest;
-    /**
-     * In minutes
-     */
+    @NonNull
+    Boolean needingConsultation;
     @NonNull
     Integer consultationDuration;
-    /**
-     * In minutes
-     */
     @NonNull
     Integer installationDuration;
     @NonNull
-    @Getter(AccessLevel.NONE)
+    @SerializedName("medPreparedSameDay")
     Boolean drugMixingSameDay;
-    /**
-     * In minutes
-     */
     @NonNull
+    @SerializedName("medPrepDuration")
     Integer drugMixingDuration;
-    /**
-     * In minutes
-     */
     @NonNull
     Integer treatmentDuration;
 
