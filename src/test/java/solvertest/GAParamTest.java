@@ -40,8 +40,8 @@ class GAParamTest {
             "instance_210_daily_9",
             "instance_90_weekly_3",
             };
-    private final Executor executor = Executors.newWorkStealingPool(Runtime.getRuntime().availableProcessors() / 2);
-    private final Gson GSON = new GsonBuilder()
+    private final Executor executor = Executors.newWorkStealingPool();
+    public static final Gson GSON = new GsonBuilder()
             .registerTypeAdapter(Instance.class,
                                  (JsonDeserializer<Instance>) (json, typeOfT, context) -> {
                                      JsonObject jsonObject = json.getAsJsonObject();
@@ -86,6 +86,8 @@ class GAParamTest {
                                                                                                                      .getAsBoolean()
                                                                                                                     ? consultationLength
                                                                                                                     : 0)
+                                                                                              .needingConsultation(o.get("needingConsultation")
+                                                                                                                    .getAsBoolean())
                                                                                               .build());
                                                                   });
                                                    patientCycleDemandList.add(new PatientCycleDemand(id,
@@ -119,7 +121,7 @@ class GAParamTest {
             }
         }
         SELECTOR_MAP.put("ts3", new TournamentSelector<>(3));
-        SELECTOR_MAP.put("es", new EliteSelector<EnumGene<PatientCycleDemand>, Integer>(1, new TournamentSelector<>(3)));
+//        SELECTOR_MAP.put("es", new EliteSelector<EnumGene<PatientCycleDemand>, Integer>(1, new TournamentSelector<>(3)));
     }
 
     private static Stream<Arguments> getGeneratedDataset() {
